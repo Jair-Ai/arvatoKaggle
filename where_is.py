@@ -9,7 +9,7 @@ import numpy as np
 
 class WhereIs:
 
-    def __init__(self, cloud: bool, bucket: Optional[None, str] = None, prefix: Optional[None, str] = None):
+    def __init__(self, cloud: bool, bucket: Optional[str] = None, prefix: Optional[str] = None):
         self.cloud = cloud
         if self.cloud:
             self.sagemaker_session = sagemaker.Session()
@@ -84,21 +84,38 @@ class CleanUp:
             self.clean_azdias.drop(drop_cols, axis=1, inplace=True)
             self.clean_customers.drop(drop_cols, axis=1, inplace=True)
 
-    def change_important_columns(self):
+    def feature_engineer(self):
+
         self.clean_azdias['WOHNLAGE'].replace(0, np.nan)
         self.clean_customers['WOHNLAGE'].replace(0, np.nan)
+
+
+        # Saving values on lists to create new columns from CAMEO_INTL_2015.
+        values_list_azdias = list(self.clean_azdias['CAMEO_INTL_2015'].values)
+        values_list_customers = list(self.clean_customers['CAMEO_INTL_2015'].values)
+
+        # Creating columns from CAMEO_INTL_2015 column.
+
+        self.clean_azdias['WEALTH'] = [value if pd.isnull(value) else int(str(value)[0]) for value in values_list_azdias]
+        self.clean_azdias['LIFE_AGE'] = [value if pd.isnull(value) else int(str(value)[1]) for value in values_list_azdias]
+
+        self.clean_customers['WEALTH'] = [value if pd.isnull(value) else int(str(value)[0]) for value in values_list_customers]
+        self.clean_customers['LIFE_AGE'] = [value if pd.isnull(value) else int(str(value)[1]) for value in values_list_customers]
+
+        # Drop Original column after.
+        self.clean_azdias.drop(['CAMEO_INTL_2015'], axis=1, inplace=True)
+        self.clean_customers.drop(['CAMEO_INTL_2015'], axis=1, inplace=True)
+
+        # Feature Engineer on PLZ8_BAUMAX.
+        self.clean_azdias['PLZ8_BAUMAX_FAMILY'] = np.where(self.clean_azdias['PLZ8_BAUMAX'] == 5, 0, self.clean_azdias['PLZ8_BAUMAX'])
+        self.clean_azdias['PLZ8_BAUMAX_bussiness'] = np.where(self.clean_azdias['PLZ8_BAUMAX'] == 5, 1,
+                                                        np.where(self.clean_azdias['PLZ8_BAUMAX'].isnull(), self.clean_azdias['PLZ8_BAUMAX'], 0))
+
+        # Drop After Feature Engineer
+
+    def normalize_categorical(self):
         self.clean_azdias['OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
         self.clean_customers['OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
-
-        values_list = list(self.clean_azdias['CAMEO_INTL_2015'].values)
-        self.clean_azdias['WEALTH'] = [value if pd.isnull(value) else int(str(value)[0]) for value in values_list]
-        self.clean_azdias['LIFE_AGE'] = [value if pd.isnull(value) else int(str(value)[1]) for value in values_list]
-
-        self.clean_customers['WEALTH'] = [value if pd.isnull(value) else int(str(value)[0]) for value in values_list]
-        self.clean_customers['LIFE_AGE'] = [value if pd.isnull(value) else int(str(value)[1]) for value in values_list]
-
-    def working_with_categorical_values(self):
-        ...
 
     def confirm_equal_columns_dataframe(self):
         return self.clean_azdias.columns == self.clean_azdias
@@ -107,6 +124,6 @@ class CleanUp:
         self.drop_initial_columns()
         self.create_nan_dict()
         self.drop_columns_nan(threshold)
-        self.change_important_columns()
+        self.feature_engineer()
         self.working_with_categorical_values()
 
