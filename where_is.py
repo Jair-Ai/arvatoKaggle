@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 import glob
 import os
 import boto3
@@ -47,6 +47,15 @@ class CleanUp:
         self.df_info_columns: pd.DatataFrame = pd.DataFrame([])
         self.df_column_attributes: pd.DatataFrame = pd.DataFrame([])
         self.columns_with_info: np.array = np.array([])
+        self.dict_to_nan: Dict[str, List[int, str]]
+
+    def load_nan_info(self, path):
+        cod_nan = pd.read_csv(path)
+        cod_nan.drop(cod_nan.columns[0], axis=1, inplace=True)
+        cod_nan.set_index('Attribute', inplace=True)
+        self.dict_to_nan = cod_nan.to_dict()['Value']
+        self.dict_to_nan['CAMEO_DEU_2015'] = [-1, 'XX']
+        self.dict_to_nan['CAMEO_DEUINTL_2015'] = [-1, 'XX']
 
     def load_info_dataframe(self, path):
         self.df_info_columns = pd.read_excel(path, engine='openpyxl')
@@ -60,25 +69,7 @@ class CleanUp:
         column_array[0] = 'to_drop'
         df_column_attributes.columns = column_array
         self.df_column_attributes.drop('to_drop', axis=1, inplace=True)
-
-    def initial_clean(self, df) -> np.array:
-        """Function to discovery and drop columns without information.
-
-        Args:
-            df (pd.DataFrame): Dataframe to clean up columns that are not in description.
-
-        Returns:
-            np.array: List with columns for clean up
-        """
-        
-        columns_with_info = self.df_info_columns.Attribute.unique()
-        columns_with_attributes = self.df_column_attributes.Attribute.unique()
-        # Excluding nan column
-        columns_with_info = np.delete(columns_with_info, 1)
-        self.columns_with_info = np.unique(np.concatenate((columns_with_info, columns_with_attributes)))
-
-        return self.columns_with_info
-
+    
     def load_customers(self, path):
         customers = pd.read_csv(path, sep=';')
         customers = customers.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
@@ -90,51 +81,61 @@ class CleanUp:
         azdias = azdias.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
         return azdias
 
-    def create_nan_dict(self, path):
-        #Load Pre Process dataframe with all nans
-        cod_nan = pd.read_csv(path)
-        cod_nan.drop(cod_nan.columns[0], axis=1, inplace=True)
-        cod_nan.set_index('Attribute', inplace=True)
-        dict_to_nan = cod_nan.to_dict()['Value']
-        dict_to_nan['CAMEO_DEU_2015'] = [-1, 'XX']
-        dict_to_nan['CAMEO_DEUINTL_2015'] = [-1, 'XX']
-        columns_not_in = {'azdias': [], 'customers': []}
-        for key, value, in dict_to_nan.items():
-            if key in self.azdias_columns:
-                self.clean_azdias[key] = self.clean_azdias[key].replace(value, np.nan)
-            else:
-                columns_not_in['azdias'].append(key)
-            if key in self.customers_columns:
-                self.clean_customers[key] = self.clean_customers[key].replace(value, np.nan)
-            else:
-                columns_not_in['customers'].append(key)
+    def get_columns_with_info(self, df) -> np.array:
+        """Function to discovery and drop columns without information.
 
-    def drop_initial_columns(self):
-        self.clean_azdias.drop(self.columns_to_drop, axis=1, inplace=True)
-        self.clean_customers.drop(self.columns_to_drop, axis=1, inplace=True)
-    
-    def drop_customers_unique_columns(self):
-        self.customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
-    
-    def all_columns_with_info(self):
-        self.df_column_attributes = self.load_attributes_dataframe()
-        columns_on_df_attributes = self.df_info_columns.Attribute.unique()
+        Args:
+            df (pd.DataFrame): Dataframe to clean up columns that are not in description.
 
-        self.df_info_columns = self.load_info_dataframe()
-        columns_on_df_info = self.df_info_columns.Attribute.unique()
-        #drop column with Nan on name
-        columns_on_df_info = np.delete(columns_on_df_info, 1)
-        #Concatenate columns in on single array
-        self.columns_with_info = np.unique(np.concatenate((columns_on_df_info, columns_on_df_attributes)))
+        Returns:
+            np.array: List with columns for clean up
+        """
 
-    
+        columns_with_info = self.df_info_columns.Attribute.unique()
+        columns_with_attributes = self.df_column_attributes.Attribute.unique()
+        # Excluding nan column
+        columns_with_info = np.delete(columns_with_info, 1)
+        self.columns_with_info = np.unique(np.concatenate((columns_with_info, columns_with_attributes)))
+
+        return self.columns_with_info
+
     def drop_columns_are_not_in_attribute_info(self, df):
         if not self.columns_with_info:
-            self.all_columns_with_info()
+            print("You need to load get_columns_with_info first.")
+            return pd.DataFrame([])
+        else:
+            columns_with_attributes = [col for col in self.columns_with_info if col  in [df.columns]]
+            df = df[columns_with_attributes]
+        return df
 
-        return df.drop(self.columns_with_info, inplace=True)
+    def create_nan_dict(self, path, df: pd.DataFrame):
+        # Load Pre Process dataframe with all nans
+        columns_not_in = {'no_value_to_replace': []}
+        if not self.dict_to_nan:
+            self.load_nan_info()
+        for key, value, in self.dict_to_nan.items():
+            if key in df:
+                df[key] = df[key].replace(value, np.nan)
+            else:
+                columns_not_in['_value_to_replace'].append(key)
+        return df
 
+    def drop_initial_columns(self, df):
+        return df.drop(self.columns_to_drop, axis=1, inplace=True)
 
+    # def drop_customers_unique_columns(self):
+    #     self.customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
+
+    def all_columns_with_info(self, path_info: str, path_attr: str):
+        self.load_attributes_dataframe(path_attr)
+        columns_on_df_attributes = self.df_info_columns.Attribute.unique()
+
+        self.load_info_dataframe(path_info)
+        columns_on_df_info = self.df_info_columns.Attribute.unique()
+        # Drop column with Nan on name
+        columns_on_df_info = np.delete(columns_on_df_info, 1)
+        # Concatenate columns in on single array
+        self.columns_with_info = list[np.unique(np.concatenate((columns_on_df_info, columns_on_df_attributes)))] 
 
     def drop_columns_nan(self, threshold: float, drop: bool = True):
         azdias_nan_per = self.clean_azdias.isnull().mean()
@@ -143,7 +144,11 @@ class CleanUp:
             self.clean_azdias.drop(drop_cols, axis=1, inplace=True)
             self.clean_customers.drop(drop_cols, axis=1, inplace=True)
 
-    def feature_engineer_part_one(self, df: pd.DataFrame):
+
+
+class FeatureEnginner:
+
+    def fs_for_cat_part_one(self, df: pd.DataFrame):
 
         df['WOHNLAGE'].replace(0, np.nan)
 
@@ -166,17 +171,20 @@ class CleanUp:
         # Drop After Feature Engineer
         df.drop(['CAMEO_INTL_2015', 'PLZ8_BAUMAX_FAMILY'], axis=1, inplace=True)
 
-    def normalize_categorical(self, df):
+    def standardize_binary_columns(self, df):
         df['OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
-        df['OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
-    
-    def feature_engineer_part_two(self):
-        generations = {0: [1, 2], # 40s
-               1: [3, 4], # 50s
-               2: [5, 6, 7], # 60s
-               3: [8, 9], # 70s
-               4: [10, 11, 12, 13], # 80s
-               5:[14, 15]} # 90s
+        df['VERS_TYP'].replace([2.0, 1.0], [1, 0], inplace=True)
+        df['ANREDE_KZ'].replace([2, 1], [1, 0], inplace=True)
+        return df
+
+
+    def fs_for_cat_part_two(self, df):
+        generations = {0: [1, 2],  # 40s
+                       1: [3, 4],  # 50s
+                       2: [5, 6, 7],  # 60s
+                       3: [8, 9],  # 70s
+                       4: [10, 11, 12, 13],  # 80s
+                       5: [14, 15]}  # 90s
 
         def classify_generation(value):
             try:
@@ -199,21 +207,43 @@ class CleanUp:
             # In case value is NaN
             except ValueError:
                 return np.nan
-        
+
         # Engineer generation column
-        azdias['PRAEGENDE_JUGENDJAHRE_GEN'] = azdias['PRAEGENDE_JUGENDJAHRE'].apply(classify_generation)
-        #azdias.loc[:,'PRAEGENDE_JUGENDJAHRE_GEN'] = azdias['PRAEGENDE_JUGENDJAHRE'].apply(classify_generation)
+        df['PRAEGENDE_JUGENDJAHRE_GEN'] = df['PRAEGENDE_JUGENDJAHRE'].apply(classify_generation)
+        # azdias.loc[:,'PRAEGENDE_JUGENDJAHRE_GEN'] = azdias['PRAEGENDE_JUGENDJAHRE'].apply(classify_generation)
 
         # Engineer movement column
-        azdias['PRAEGENDE_JUGENDJAHRE_MOV'] = azdias['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
-        #azdias_new.loc[:,'PRAEGENDE_JUGENDJAHRE_MOV'] = azdias_new['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
-        
+        df['PRAEGENDE_JUGENDJAHRE_MOV'] = df['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
+        # azdias_new.loc[:,'PRAEGENDE_JUGENDJAHRE_MOV'] = azdias_new['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
 
+        df.drop('PRAEGENDE_JUGENDJAHRE')
+    
+    def correlated_columns_to_drop(self, df, min_corr_level=0.95):
+        """Drop columns based on high correlated columns.
+
+        Args:
+            df (pd.DataFrame): Dataframe with columns to check correlation.
+            min_corr_level (float, optional): Mininum correlaction to choose to drop. Defaults to 0.95.
+
+        Returns:
+            List[List[str], pd.DataFrame]: List with columns droped, and dataframe without this columns.
+        """
+
+        # Create correlation matrix
+        corr_matrix = df.corr().abs()
+
+        # Select upper triangle of correlation matrix
+        upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
+
+        # Find index of feature columns with correlation greater than min_corr_level
+        to_drop = [column for column in upper.columns if any(upper[column] > min_corr_level)]
+
+        return [to_drop, df.drop(to_drop, inplace=True)]
+    
     def confirm_equal_columns_dataframe(self, df_1, df_2):
-        if df_1.columns == df_2.columns:
-            return []
+        return set(df_1).difference(df_2)
 
-        return self.clean_azdias.columns == self.clean_azdias
+
 
     def pipeline(self, threshold: float):
         self.drop_initial_columns()
