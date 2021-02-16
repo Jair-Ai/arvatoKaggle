@@ -1,7 +1,6 @@
 from typing import Dict, List, Optional
 import logging
 import json
-import os
 import pandas as pd
 import numpy as np
 
@@ -33,14 +32,14 @@ def drop_columns_nan(df, threshold: float = .2, drop: bool = True):
     return df
 
 
-def pipeline_data_wrangler(df_test, path_dict, columns_to_keep, catboost: bool = False):
-    # Step 1 drop columns that are not inicial analises
-    df_test = df_test[columns_to_keep]
-
-
 class CleanUp:
 
     def __init__(self, paths: List[str]):
+        """Class to clean up the dataframe for better analyses, need list of paths
+
+        Args:
+            paths:
+        """
 
         self.columns_not_in = {'azdias': [], 'customers': []}
         self.columns_to_drop = {'D19_LETZTER_KAUF_BRANCHE': 'Other columns name, no descriptions',
@@ -124,44 +123,49 @@ class CleanUp:
     # def drop_customers_unique_columns(self):
     #     self.customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
 
-    def pipeline_clean_up(self, path_dict: Dict[str, str], dfs: List[pd.DataFrame]):
-        """Pipeline function to make the first data wrangler, after that dataframe is ready for catboost
+    def pipeline_clean_up(self, dfs: List[pd.DataFrame], **kwargs) -> List[pd.DataFrame]:
+        """Pipeline function to make the first data wrangler, after that dataframe is ready for catboost.
 
         Args:
-            path_dict Dict[str,str]: Dict with all necessary path for pipeline, minimum key ['nan_info']
-            dfs List[pd.DataFrame]: List with dataframes to clean_up
+            dfs (pd.DataFrame): List with dataframes to clean_up.
+            **kwargs: Arbitrary keyword arguments.
+        Keyword Args:
+            unknowns_df (pd.DataFrame): Dataframe with unknown variables of each columns.
+            info_df (pd.DataFrame): Dataframe with column information.
+            attr_df (pd.DataFrame): Dataframe with columns attributes.
+
+
 
         Returns:
+            List[pd.Dataframe]: All Dataframes cleaned.
 
         """
         # 1 Get all columns on attr and info columns and drop
-        # 2 Drop columns there are not in attr or info
+
         dfs_cleaner = dfs
-        try:
-            with open("../data/cleaned_data/columns_to_drop.json", "r") as read_file:
-                columns_to_keep = json.load(read_file)
-                self.load_nan_info(path_dict['nan_info'])
-                for idx, df in enumerate(dfs_cleaner):
-                    dfs_cleaner[idx] = dfs_cleaner[columns_to_keep]
-                    dfs_cleaner[idx], _ = self.set_unknown_value_as_nan(df)
-        except OSError as e:
-            logging.warning("No file exist with columns, ll start cleanup pipeline")
-            # 1 Get all columns on attr and info columns and drop
-            self.load_info_dataframe(path_dict['info_df'])
-            self.load_attributes_dataframe(path_dict['attr_df'])
-            self.get_columns_with_info()
-            # 2 Drop columns there are not in attr or info
-            for df in dfs_cleaner:
-                df = self.drop_columns_are_not_in_attribute_info(df)
-            # 3 Get invalid values from attr_df and create invalid dataframe
-            self.load_nan_info(path_dict['nan_info'])
-            # 4 Iterate over dataframes and transform invalid on np.nan
-            for idx, df in enumerate(dfs_cleaner):
-                dfs_cleaner[idx], _ = self.set_unknown_value_as_nan(df)
-                # 5 Drop columns with more than some % of nan, choose the threshold, default = 20%
-                dfs_cleaner[idx] = drop_columns_nan(df)
-            columns_to_save = {'columns_to_keep': [dfs_cleaner[0].columns]}
-            with open("../data/cleaned_data/columns_to_drop.json", "w") as outfile:
-                json.dump(columns_to_save, outfile)
-        finally:
-            return dfs_cleaner
+        self.load_nan_info(kwargs.get('unknowns_df'))
+        if not self.columns_with_info:
+            try:
+                with open("../data/cleaned_data/columns_to_drop.json", "r") as read_file:
+                    self.columns_with_info = json.load(read_file)['columns_to_keep']
+
+            except OSError as e:
+                logging.warning(e, "\nNo file exist with columns, ll start cleanup pipeline")
+                # 1 Get all columns on attr and info columns and drop
+                self.load_info_dataframe(kwargs.get('info_df'))
+                self.load_attributes_dataframe(kwargs.get('attr_df'))
+                self.get_columns_with_info()
+
+                columns_to_save = {'columns_to_keep': [dfs_cleaner[0].columns]}
+                with open("../data/cleaned_data/columns_to_drop.json", "w") as outfile:
+                    json.dump(columns_to_save, outfile)
+
+        # 2 Drop columns there are not in attr or info
+        # 3 Get invalid values from attr_df and create invalid dataframe
+        # 4 Iterate over dataframes and transform invalid on np.nan
+        for idx, df in enumerate(dfs_cleaner):
+            dfs_cleaner[idx] = self.drop_columns_are_not_in_attribute_info(df)
+            dfs_cleaner[idx], _ = self.set_unknown_value_as_nan(df)
+            # 5 Drop columns with more than some % of nan, choose the threshold, default = 20%
+            dfs_cleaner[idx] = drop_columns_nan(df)
+        return dfs_cleaner

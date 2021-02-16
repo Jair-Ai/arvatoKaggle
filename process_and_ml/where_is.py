@@ -21,7 +21,8 @@ class WhereIs:
                                         df_file['Key'][:-3] == 'csv' or df_file['Key'][:-3] == 'lsx']
 
         else:
-            self.data_path = './data'
+            self.data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                          '../data')
             self.object_list_content = [f for f_ in [glob.glob(self.data_path + file_types) for file_types in
                                                      ("/**/*.csv", "/**/*.xlsx")] for f in f_]
 

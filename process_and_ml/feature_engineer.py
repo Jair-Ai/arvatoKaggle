@@ -1,10 +1,8 @@
-
 import pandas as pd
 from numba import np
 
 
 def fs_for_cat_part_one(df: pd.DataFrame):
-
     df['WOHNLAGE'].replace(0, np.nan)
 
     # Saving values on lists to create new columns from CAMEO_INTL_2015.
@@ -67,11 +65,13 @@ def fs_for_cat_part_two(df):
 
     df.drop('PRAEGENDE_JUGENDJAHRE')
 
+
 def standardize_binary_columns(df):
     df['OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
     df['VERS_TYP'].replace([2.0, 1.0], [1, 0], inplace=True)
     df['ANREDE_KZ'].replace([2, 1], [1, 0], inplace=True)
     return df
+
 
 def correlated_columns_to_drop(df, min_corr_level=0.95):
     """Drop columns based on high correlated columns.
@@ -101,8 +101,6 @@ def confirm_equal_columns_dataframe(df_1, df_2):
 
 
 def fs_pipeline_stage_one(df):
-    df = fs_pipeline_stage_one(df)
-    df =
-
-
-    
+    ...
+    # df = fs_pipeline_stage_one(df)
+    # df =
