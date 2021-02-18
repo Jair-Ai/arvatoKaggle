@@ -55,14 +55,17 @@ class CleanUp:
         self.df_info_columns = pd.read_excel(path, engine='openpyxl')
         column_array = self.df_info_columns.iloc[0].values
         column_array[0] = 'to_drop'
+        self.df_info_columns.columns = column_array
         self.df_info_columns.drop('to_drop', axis=1, inplace=True)
+        self.df_info_columns = self.df_info_columns.iloc[1:]
 
     def load_attributes_dataframe(self, path):
-        df_column_attributes = pd.read_excel(path, engine='openpyxl')
-        column_array = df_column_attributes.iloc[0].values
+        self.df_column_attributes = pd.read_excel(path, engine='openpyxl')
+        column_array = self.df_column_attributes.iloc[0].values
         column_array[0] = 'to_drop'
-        df_column_attributes.columns = column_array
+        self.df_column_attributes.columns = column_array
         self.df_column_attributes.drop('to_drop', axis=1, inplace=True)
+        self.df_column_attributes = self.df_column_attributes.iloc[1:]
 
     def get_columns_with_info(self) -> np.array:
         """Function to discovery and drop columns without information.
@@ -74,7 +77,7 @@ class CleanUp:
         columns_with_info = self.df_info_columns.Attribute.unique()
         columns_with_attributes = self.df_column_attributes.Attribute.unique()
         # Excluding nan column
-        columns_with_info = np.delete(columns_with_info, 1)
+        columns_with_attributes = np.delete(columns_with_attributes, 1)
         self.columns_with_info = list(np.unique(np.concatenate((columns_with_info, columns_with_attributes))))
 
         return self.columns_with_info
@@ -84,7 +87,7 @@ class CleanUp:
             logging.warning("You need to load get_columns_with_info first.")
             return pd.DataFrame([])
         else:
-            columns_with_attributes = [col for col in self.columns_with_info if col in [df.columns]]
+            columns_with_attributes = [col for col in self.columns_with_info if col in df.columns]
             df = df[columns_with_attributes]
         return df
 
@@ -114,7 +117,7 @@ class CleanUp:
             if key in df:
                 df[key] = df[key].replace(value, np.nan)
             else:
-                columns_not_in['_value_to_replace'].append(key)
+                columns_not_in['no_value_to_replace'].append(key)
         return df, columns_not_in
 
     def drop_initial_columns(self, df):
@@ -123,18 +126,16 @@ class CleanUp:
     # def drop_customers_unique_columns(self):
     #     self.customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
 
-    def pipeline_clean_up(self, dfs: List[pd.DataFrame], **kwargs) -> List[pd.DataFrame]:
+    def pipeline_clean_up(self, dfs: Dict[str, pd.DataFrame], **kwargs) -> List[pd.DataFrame]:
         """Pipeline function to make the first data wrangler, after that dataframe is ready for catboost.
 
         Args:
-            dfs (pd.DataFrame): List with dataframes to clean_up.
+            dfs (Dict[str,pd.DataFrame]): List with dataframes to clean_up.
             **kwargs: Arbitrary keyword arguments.
         Keyword Args:
             unknowns_df (pd.DataFrame): Dataframe with unknown variables of each columns.
             info_df (pd.DataFrame): Dataframe with column information.
             attr_df (pd.DataFrame): Dataframe with columns attributes.
-
-
 
         Returns:
             List[pd.Dataframe]: All Dataframes cleaned.
@@ -146,26 +147,32 @@ class CleanUp:
         self.load_nan_info(kwargs.get('unknowns_df'))
         if not self.columns_with_info:
             try:
-                with open("../data/cleaned_data/columns_to_drop.json", "r") as read_file:
+                with open("./data/cleaned_data/columns_to_keep.json", "r") as read_file:
                     self.columns_with_info = json.load(read_file)['columns_to_keep']
 
             except OSError as e:
-                logging.warning(e, "\nNo file exist with columns, ll start cleanup pipeline")
+                logging.warning("\nNo file exist with columns, ll start cleanup pipeline")
                 # 1 Get all columns on attr and info columns and drop
                 self.load_info_dataframe(kwargs.get('info_df'))
                 self.load_attributes_dataframe(kwargs.get('attr_df'))
+                # 2 Get invalid values from attr_df and create invalid dataframe.
                 self.get_columns_with_info()
+                # 3 Drop columns there are not in attr or info.
+                dfs_cleaner['azdias'] = self.drop_columns_are_not_in_attribute_info(dfs_cleaner['azdias'])
+                # 4 Set unknown values as nan.
+                dfs_cleaner['azdias'], _ = self.set_unknown_value_as_nan(dfs_cleaner['azdias'])
+                # 5 Drop columns with more than some % of nan, choose the threshold, default = 20%.
+                dfs_cleaner['azdias'] = drop_columns_nan(dfs_cleaner['azdias'])
+                self.columns_with_info = dfs_cleaner['azdias'].columns
+                columns_to_save = {'columns_to_keep': list(self.columns_with_info)}
 
-                columns_to_save = {'columns_to_keep': [dfs_cleaner[0].columns]}
-                with open("../data/cleaned_data/columns_to_drop.json", "w") as outfile:
+                with open("./data/cleaned_data/columns_to_keep.json", "w") as outfile:
                     json.dump(columns_to_save, outfile)
 
-        # 2 Drop columns there are not in attr or info
-        # 3 Get invalid values from attr_df and create invalid dataframe
-        # 4 Iterate over dataframes and transform invalid on np.nan
-        for idx, df in enumerate(dfs_cleaner):
-            dfs_cleaner[idx] = self.drop_columns_are_not_in_attribute_info(df)
-            dfs_cleaner[idx], _ = self.set_unknown_value_as_nan(df)
+        # 6 Iterate over dataframes and transform invalid on np.nan
+        for key, value in dfs_cleaner.items():
+            dfs_cleaner[key] = dfs_cleaner[key][self.columns_with_info]
             # 5 Drop columns with more than some % of nan, choose the threshold, default = 20%
-            dfs_cleaner[idx] = drop_columns_nan(df)
+            dfs_cleaner[key], _ = self.set_unknown_value_as_nan(dfs_cleaner[key])
+
         return dfs_cleaner
