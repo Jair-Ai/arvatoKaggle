@@ -4,24 +4,34 @@ import json
 import pandas as pd
 import numpy as np
 
+from models.constants import RANDOM_STATE
 
-def load_customers(path):
-    customers = pd.read_csv(path, sep=';')
+
+def load_customers(path, sample_ratio: Optional[float] = None):
+    if sample_ratio:
+        customers = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=RANDOM_STATE)
+    else:
+        customers = pd.read_csv(path, sep=';')
     customers = customers.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
     customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
     return customers
 
 
-def load_azdias(path):
-    azdias = pd.read_csv(path, sep=';')
+def load_azdias(path, sample_ratio: Optional[float] = None):
+    if sample_ratio:
+        azdias = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=RANDOM_STATE)
+    else:
+        azdias = pd.read_csv(path, sep=';')
     azdias = azdias.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
     return azdias
 
 
-def load_test_file(path, columns_to_keep):
+def load_test_file(path):
     df_test = pd.read_csv(path, sep=';')
     df_test = df_test.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
-    return df_test[columns_to_keep]
+    lnr_for_kaggle = df_test['LNR']
+    df_test.drop('LNR', axis=1, inplace=True)
+    return df_test, lnr_for_kaggle
 
 
 def drop_columns_nan(df, threshold: float = .2, drop: bool = True):
@@ -126,7 +136,7 @@ class CleanUp:
     # def drop_customers_unique_columns(self):
     #     self.customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
 
-    def pipeline_clean_up(self, dfs: Dict[str, pd.DataFrame], **kwargs) -> List[pd.DataFrame]:
+    def pipeline_clean_up(self, dfs: Dict[str, pd.DataFrame], **kwargs) -> Dict[str, pd.DataFrame]:
         """Pipeline function to make the first data wrangler, after that dataframe is ready for catboost.
 
         Args:
@@ -176,3 +186,5 @@ class CleanUp:
             dfs_cleaner[key], _ = self.set_unknown_value_as_nan(dfs_cleaner[key])
 
         return dfs_cleaner
+    # TODO: Test on test file and train file
+    # TODO: Check the columns of cleaned azdias em compare with datawrangler.
