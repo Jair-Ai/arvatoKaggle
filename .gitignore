@@ -255,3 +255,6 @@ dmypy.json
 # Local History for Visual Studio Code
 .history/
 /.vscode/
+
+# Ignore dynaconf secret files
+.secrets.*

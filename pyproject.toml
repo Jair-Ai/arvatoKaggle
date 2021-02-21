@@ -24,6 +24,7 @@ dask = {extras = ["complete"], version = "^2021.2.0"}
 dask-ml = {extras = ["complete"], version = "^1.8.0"}
 kaggle = "^1.5.10"
 dvc = "^1.11.16"
+dynaconf = "^3.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"
