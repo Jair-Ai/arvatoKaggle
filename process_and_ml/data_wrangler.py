@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List, Optional
 import logging
 import json
@@ -56,6 +57,8 @@ class CleanUp:
                                 'EINGEFUEGT_AM': 'No information about, data as input', 'LNR': 'Client Number',
                                 'CAMEO_DEUG_2015': 'Too Many Values'}
         self.paths: List[str] = paths
+        self.path_columns_to_info = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                 "../data/cleaned_data/columns_to_keep.json")
         self.df_info_columns: pd.DatataFrame = pd.DataFrame([])
         self.df_column_attributes: pd.DatataFrame = pd.DataFrame([])
         self.columns_with_info: np.array = np.array([])
@@ -157,7 +160,7 @@ class CleanUp:
         self.load_nan_info(kwargs.get('unknowns_df'))
         if not self.columns_with_info:
             try:
-                with open("./data/cleaned_data/columns_to_keep.json", "r") as read_file:
+                with open(self.path_columns_to_info, "r") as read_file:
                     self.columns_with_info = json.load(read_file)['columns_to_keep']
 
             except OSError as e:
@@ -176,7 +179,7 @@ class CleanUp:
                 self.columns_with_info = dfs_cleaner['azdias'].columns
                 columns_to_save = {'columns_to_keep': list(self.columns_with_info)}
 
-                with open("./data/cleaned_data/columns_to_keep.json", "w") as outfile:
+                with open(self.path_columns_to_info, "w") as outfile:
                     json.dump(columns_to_save, outfile)
 
         # 6 Iterate over dataframes and transform invalid on np.nan

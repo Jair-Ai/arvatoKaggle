@@ -32,7 +32,7 @@ git add data/crm_users/training_data.csv
 ### Step 8 -A (Optional step, do it only if you experiment.) Retrieve an old version.
 git checkout HEAD^1 data/crm_users/training_data.csv 
 
-## Step 8 -B (Optional step, do it only if you experiment.)
+### Step 8 -B (Optional step, do it only if you experiment.)
 dvc checkout
 
 ### Step 9 -A (Optional) Adding remote repository
@@ -46,6 +46,21 @@ git add .dvc/config
 ### Step 9 -C (Optional) 
 git commit -m "Configuring remote storage."
 
-## The best way to control data
+## The best way to control data:
+
+### Add Data:
+dvc add data/crm_users/training_data.csv 
+
+###  Commit to track on the git:
+git commit -m "Added population v1."
+0
+### Tag the data:
+git tag -a 'training-v1' -m 'first dataset with 4 columns'
+
+### Change de dataframe
+
+### Adding changes on dvc
+dvc add data/cleaned_after_pipeline/population.csv
+
 
 
