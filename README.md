@@ -20,26 +20,26 @@ git commit -m "Initialize DVC"
 ## Step 5 - Start to tracking a data(data path + data name):
 dvc add data/crm_users/training_data.csv 
 
-# Step 6 - If you want to track the file on git use the option -f (Do this because we ignored data file):
+## Step 6 - If you want to track the file on git use the option -f (Do this because we ignored data file):
 git add -f data/crm_users/training_data.csv.dvc
 
-# Step 7 - After make changes on data and update the tracking file:
+## Step 7 - After make changes on data and update the tracking file:
 git add data/crm_users/training_data.csv 
 
-# Step 8 -A (Optional step, do it only if you experiment.) Retrieve an old version.
+## Step 8 -A (Optional step, do it only if you experiment.) Retrieve an old version.
 git checkout HEAD^1 data/crm_users/training_data.csv 
 
-# Step 8 -B (Optional step, do it only if you experiment.)
+## Step 8 -B (Optional step, do it only if you experiment.)
 dvc checkout
 
-# Step 9 -A (Optional) Adding remote repository
+## Step 9 -A (Optional) Adding remote repository
 dvc remote add -d storage s3://mybucket/dvcstore
-#or locally
+###or locally
 dvc remote add -d dvc-remote /tmp/dvc-storage
 
-# Step 9 -B (Optional) 
+## Step 9 -B (Optional) 
 git add .dvc/config
 
-# Step 9 -C (Optional) 
+## Step 9 -C (Optional) 
 git commit -m "Configuring remote storage."
 
