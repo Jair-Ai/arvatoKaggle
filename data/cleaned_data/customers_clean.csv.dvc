@@ -1,0 +1,4 @@
+outs:
+- md5: 652cbc72ebe43e6dabf9b86978165853
+  size: 147093586
+  path: customers_clean.csv

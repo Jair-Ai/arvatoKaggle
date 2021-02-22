@@ -1,27 +1,45 @@
 #Install Docker File
 docker build -t getting-started .
 
-#Install kubeflow
-## Step 1 - Install k8s:
-sudo snap install microk8s --classic --channel=latest/edge
+#Data Versioning with DVC
+[DVC website](https://dvc.org)
 
-## Step 2 - Check your installation:
-sudo microk8s status --wait-ready
+[DVC repository](https://github.com/iterative/dvc)
+## Step 1 - Adding dvc as dependency:
+poetry add DVC
 
-## Step3 - Enable some good components(gpu is only if you have one):
-microk8s enable dns dashboard gpu helm3 host-access storage istio
+## Step 2 - Start dvc:
+dvc init
 
-## Step 4 - Enable kubeflow(it take several minutes, be patient):
-microk8s enable kubeflow
+## Step 3 - Do commit of to initialize dvc:
+git commit -m "Initialize DVC"
 
-## Step 5 - Optional step, only if you have problem with kubeflow instalation:
+## Step 4 - Add data path to .gitignore:
+/data/
 
-microk8s.kubectl run --rm -it --restart=Never --image=ubuntu connectivity-check -- bash -c "apt update && apt install -y curl && curl https://api.jujucharms.com/charmstore/v5/~kubeflow-charmers/ambassador-88/icon.svg"
+## Step 5 - Start to tracking a data(data path + data name):
+dvc add data/crm_users/training_data.csv 
 
-# Step 6 - Set up an easy password:
-microk8s juju config dex-auth static-username=admin
-microk8s juju config dex-auth static-password=yourpass
+# Step 6 - If you want to track the file on git use the option -f (Do this because we ignored data file):
+git add -f data/crm_users/training_data.csv.dvc
 
+# Step 7 - After make changes on data and update the tracking file:
+git add data/crm_users/training_data.csv 
 
-# Step 7 -Go to dashboard http://10.64.44.xip.io
+# Step 8 -A (Optional step, do it only if you experiment.) Retrieve an old version.
+git checkout HEAD^1 data/crm_users/training_data.csv 
+
+# Step 8 -B (Optional step, do it only if you experiment.)
+dvc checkout
+
+# Step 9 -A (Optional) Adding remote repository
+dvc remote add -d storage s3://mybucket/dvcstore
+#or locally
+dvc remote add -d dvc-remote /tmp/dvc-storage
+
+# Step 9 -B (Optional) 
+git add .dvc/config
+
+# Step 9 -C (Optional) 
+git commit -m "Configuring remote storage."
 
