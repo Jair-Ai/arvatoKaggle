@@ -1,3 +1,4 @@
+from ..config import settings
 from kaggle.api.kaggle_api_extended import KaggleApi
 import numpy as np
 import pandas as pd
