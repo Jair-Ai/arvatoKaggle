@@ -1,0 +1,4 @@
+outs:
+- md5: b217f718aa182a54db041b339462dd89
+  size: 6102
+  path: azdias_costumer_to_nan.csv
