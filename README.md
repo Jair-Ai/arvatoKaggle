@@ -62,5 +62,14 @@ git tag -a 'training-v1' -m 'first dataset with 4 columns'
 ### Adding changes on dvc
 dvc add data/cleaned_after_pipeline/population.csv
 
+## HELPERS
+
+### Find all commits with keyword - data
+git log --grep=data:
+
+### Find all tags in the project.
+git tag -l
+
+
 
 
