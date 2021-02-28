@@ -38,6 +38,7 @@ def load_test_file(path):
 def drop_columns_nan(df, threshold: float = .2, drop: bool = True):
     azdias_nan_per = df.isnull().mean()
     drop_cols = df.columns[azdias_nan_per > threshold]
+    print(f'Columns droped, with nan more than threashold: \n{drop_cols}')
     if drop:
         df.drop(drop_cols, axis=1, inplace=True)
     return df

@@ -1,1 +1,2 @@
-RANDOM_STATE = 42
+RANDOM_STATE=42
+DATA_PATH_CLEANED='../data/data_for_train'
