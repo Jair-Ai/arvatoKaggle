@@ -1,4 +1,4 @@
 [core]
     remote = dvc-remote
 ['remote "dvc-remote"']
-    url = /tmp/dvc-storage
+    url = /home/jair/Documents/arvato-files
