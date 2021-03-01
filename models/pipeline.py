@@ -50,7 +50,7 @@ def cat_features_fill_na(df: pd.DataFrame,
             # The dtype is object instead of category
             df_copy[cat] = df_copy[cat].fillna('UNKNOWN')
 
-        # if df[cat]
+        #if df[cat]
 
     return df_copy
 
@@ -76,7 +76,8 @@ def preprocessing_baseline(df: pd.DataFrame,
     x = df.drop(columns=target)
     y = df[target]
 
-    if cat_features:
+    # TODO IF CAT FEATURES CHECK EACH COLUMN AND TRANFORM TO STR, AFTER SET NAN AS UNKNOWN
+    if len(cat_features) > 1:
         x_filled = cat_features_fill_na(x, cat_features=cat_features)
     else:
         x_filled = x.copy()
