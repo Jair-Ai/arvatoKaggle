@@ -1,7 +1,7 @@
 import pandas as pd
 
 from collections import namedtuple
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Union, Optional, Dict
 from sklearn.model_selection import train_test_split
 from catboost import CatBoostClassifier, Pool
 from sklearn.metrics import accuracy_score, roc_auc_score
@@ -39,7 +39,8 @@ def cat_features_fill_na(df: pd.DataFrame,
     """
     df_copy = df.copy()
     # check types
-
+    data_types_bool = {key: {isinstance(item, (int, str)) for item in df[key].value_counts().index.tolist()} for
+                      key in cat_features}
     for cat in cat_features:
         try:
             df_copy[cat] = (
@@ -50,7 +51,9 @@ def cat_features_fill_na(df: pd.DataFrame,
             # The dtype is object instead of category
             df_copy[cat] = df_copy[cat].fillna('UNKNOWN')
 
-        #if df[cat]
+        if len(data_types_bool[cat]) > 1:
+            df_copy[cat] = df_copy[cat].astype('str')
+
 
     return df_copy
 
@@ -154,7 +157,7 @@ def compute_metrics(model: Union[Pipeline, CatBoostClassifier],
 
 def show_metrics_baseline(model: Union[Pipeline, CatBoostClassifier],
                           features: Features,
-                          labels: Labels) -> None:
+                          labels: Labels) -> Dict[str, str]:
     """Giving `model`, `features` and `labels` show accuracy and AUC
     for training, testing and validation data
     Model passed in argument `model` has to be already fitted
@@ -162,6 +165,7 @@ def show_metrics_baseline(model: Union[Pipeline, CatBoostClassifier],
     split_names = [field.replace('X_', '').capitalize()
                    for field in features._fields]
 
+    dict_metrics = {}
     for split_name, split_features, split_labels in zip(split_names,
                                                         features,
                                                         labels):
@@ -172,8 +176,12 @@ def show_metrics_baseline(model: Union[Pipeline, CatBoostClassifier],
                                                x=split_features,
                                                y=split_labels)
 
+        dict_metrics[split_name + 'Acc'] = split_acc
+        dict_metrics[split_name + 'AUC'] = split_auc
         print(f'Accuracy {split_name}: {split_acc}')
         print(f'AUC {split_name}: {split_auc}')
+
+    return dict_metrics
 
 
 def target_stats_by_feature(df: pd.DataFrame,

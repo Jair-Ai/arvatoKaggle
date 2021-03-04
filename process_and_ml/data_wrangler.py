@@ -112,6 +112,7 @@ class CleanUp:
         self.dict_to_nan = cod_nan.to_dict()['Value']
         self.dict_to_nan['CAMEO_DEU_2015'] = [-1, 'XX']
         self.dict_to_nan['CAMEO_DEUINTL_2015'] = [-1, 'XX']
+        self.dict_to_nan['CAMEO_DEUG_2015'] = [-1, 'X']
 
     def set_unknown_value_as_nan(self, df: pd.DataFrame, path: Optional[str] = None):
         """
