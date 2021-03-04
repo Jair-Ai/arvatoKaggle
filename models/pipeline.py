@@ -42,6 +42,10 @@ def cat_features_fill_na(df: pd.DataFrame,
     data_types_bool = {key: {isinstance(item, (int, str)) for item in df[key].value_counts().index.tolist()} for
                        key in cat_features}
     for cat in cat_features:
+        if len(data_types_bool[cat]) > 1:
+            df_copy[cat] = pd.to_numeric(df_copy[cat], downcast='signed')
+            df_copy[cat] = df_copy[cat].apply(lambda x: int(x) if not np.isnan(x) else '')
+            df_copy[cat] = np.where(df_copy[cat] == '', np.nan, df_copy[cat])
         try:
             df_copy[cat] = (
                 df_copy[cat].cat.add_categories('UNKNOWN').fillna('UNKNOWN')
@@ -51,10 +55,7 @@ def cat_features_fill_na(df: pd.DataFrame,
             # The dtype is object instead of category
             df_copy[cat] = df_copy[cat].fillna('UNKNOWN')
 
-        if len(data_types_bool[cat]) > 1:
-            df_copy[cat] = pd.to_numeric(df_copy[cat], downcast='signed')
-            df_copy[cat] = df_copy[cat].apply(lambda x: int(x) if not np.isnan(x) else '')
-            df_copy[cat] = np.where(df_copy[cat] == '', np.nan, df_copy[cat])
+
 
     return df_copy
 
