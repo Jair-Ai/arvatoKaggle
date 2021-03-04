@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 from collections import namedtuple
 from typing import List, Tuple, Union, Optional, Dict
 from sklearn.model_selection import train_test_split
@@ -40,7 +40,7 @@ def cat_features_fill_na(df: pd.DataFrame,
     df_copy = df.copy()
     # check types
     data_types_bool = {key: {isinstance(item, (int, str)) for item in df[key].value_counts().index.tolist()} for
-                      key in cat_features}
+                       key in cat_features}
     for cat in cat_features:
         try:
             df_copy[cat] = (
@@ -52,8 +52,9 @@ def cat_features_fill_na(df: pd.DataFrame,
             df_copy[cat] = df_copy[cat].fillna('UNKNOWN')
 
         if len(data_types_bool[cat]) > 1:
-            df_copy[cat] = df_copy[cat].astype('str')
-
+            df_copy[cat] = pd.to_numeric(df_copy[cat], downcast='signed')
+            df_copy[cat] = df_copy[cat].apply(lambda x: int(x) if not np.isnan(x) else '')
+            df_copy[cat] = np.where(df_copy[cat] == '', np.nan, df_copy[cat])
 
     return df_copy
 
