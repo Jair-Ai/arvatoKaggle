@@ -5,12 +5,12 @@ import json
 import pandas as pd
 import numpy as np
 
-from models.constants import RANDOM_STATE
+from config import settings
 
 
 def load_customers(path, sample_ratio: Optional[float] = None):
     if sample_ratio:
-        customers = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=RANDOM_STATE)
+        customers = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=settings.RANDOM_STATE)
     else:
         customers = pd.read_csv(path, sep=';')
     customers = customers.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
@@ -20,7 +20,7 @@ def load_customers(path, sample_ratio: Optional[float] = None):
 
 def load_azdias(path, sample_ratio: Optional[float] = None):
     if sample_ratio:
-        azdias = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=RANDOM_STATE)
+        azdias = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=settings.RANDOM_STATE)
     else:
         azdias = pd.read_csv(path, sep=';')
     azdias = azdias.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})

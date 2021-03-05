@@ -8,7 +8,9 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.pipeline import Pipeline
 from joblib import dump, load
 
-from .constants import PATH_MODELS, RANDOM_STATE
+from helpers.projetct_paths import PATH_MODELS
+
+from config import settings
 
 Features = namedtuple('Features', 'X_train X_test X_valid')
 Labels = namedtuple('Labels', 'y_train y_test y_valid')
@@ -55,8 +57,6 @@ def cat_features_fill_na(df: pd.DataFrame,
             # The dtype is object instead of category
             df_copy[cat] = df_copy[cat].fillna('UNKNOWN')
 
-
-
     return df_copy
 
 
@@ -93,7 +93,7 @@ def preprocessing_baseline(df: pd.DataFrame,
                 x_filled,
                 y,
                 test_size=test_size + valid_size,
-                random_state=RANDOM_STATE,
+                random_state=settings.RANDOM_STATE,
                 stratify=y
             )
         )
@@ -102,7 +102,7 @@ def preprocessing_baseline(df: pd.DataFrame,
             train_test_split(x_test_and_valid,
                              y_test_and_valid,
                              test_size=valid_size / (test_size + valid_size),
-                             random_state=RANDOM_STATE,
+                             random_state=settings.RANDOM_STATE,
                              stratify=y_test_and_valid)
         )
     except ValueError as value_error:
@@ -120,7 +120,7 @@ def preprocessing_baseline(df: pd.DataFrame,
                 x_filled,
                 y,
                 test_size=valid_size,
-                random_state=RANDOM_STATE,
+                random_state=settings.RANDOM_STATE,
                 stratify=y
             )
 
@@ -130,7 +130,7 @@ def preprocessing_baseline(df: pd.DataFrame,
                 x_filled,
                 y,
                 test_size=test_size,
-                random_state=RANDOM_STATE,
+                random_state=settings.RANDOM_STATE,
                 stratify=y
             )
 
@@ -209,6 +209,14 @@ def target_stats_by_feature(df: pd.DataFrame,
 
     return df_grouped.sort_values(by=f'{target}_mean', ascending=False)
 
+
+def pipeline_after_concat(df_to_model):
+    cat_features = df_to_model.select_dtypes(include=['category', 'object']).columns
+    features, labels = preprocessing_baseline(df_to_model,
+                                              cat_features=cat_features,
+                                              target='is_customer')
+
+    return cat_features, features, labels
 
 def save_catboost_model(catboost_model: CatBoostClassifier,
                         model_name: str,

@@ -1,5 +1,6 @@
 import pandas as pd
 from numba import np
+import dask.dataframe as dd
 
 
 def fs_for_cat_part_one(df: pd.DataFrame):
@@ -104,3 +105,26 @@ def fs_pipeline_stage_one(df):
     ...
     # df = fs_pipeline_stage_one(df)
     # df =
+
+
+def fs_for_cat_boost(df_population: pd.DataFrame, df_customer: pd.DataFrame) -> pd.DataFrame:
+    """Function to concatenate dataframe in any size.
+    
+    Args:
+        df_population: azdias dataframe, ll have new column as customer=0
+        df_customer: customer dataframe, ll have new column as customer=1
+
+    Returns:
+        
+
+    """""
+
+    df_to_model = dd.concat(
+        [dd.from_pandas(df_customer.assign(is_customer=1), npartitions=10),
+         dd.from_pandas(df_population.assign(is_customer=0), npartitions=10)]
+    )
+    path = '../data/cat_dfs/df_concat_pop_and_customer.csv'
+    df_to_model.to_csv(path, single_file=True)
+    dataframe_concatenated = pd.read_csv(path)
+    return dataframe_concatenated
+    # TODO TERMINAR ESTA PIPELINE DE DADOS E FACILITAR A VIDA NA HORA DE TREINAR O MODELO
