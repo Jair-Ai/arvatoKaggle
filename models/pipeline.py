@@ -218,6 +218,7 @@ def pipeline_after_concat(df_to_model):
 
     return cat_features, features, labels
 
+
 def save_catboost_model(catboost_model: CatBoostClassifier,
                         model_name: str,
                         pool_data: Pool) -> None:

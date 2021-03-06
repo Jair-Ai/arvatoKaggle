@@ -1,0 +1,15 @@
+artifact_uri: ../mlruns/1/8384389c07044d488e5eb041bc13b75c/artifacts
+end_time: 1615034722072
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: 8384389c07044d488e5eb041bc13b75c
+run_uuid: 8384389c07044d488e5eb041bc13b75c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1615034720268
+status: 3
+tags: []
+user_id: jair
