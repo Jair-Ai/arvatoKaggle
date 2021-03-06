@@ -258,5 +258,6 @@ dmypy.json
 
 # Ignore dynaconf secret files
 .secrets.*
-/terms_and_conditions/
 /.terms_and_conditions/
+/models/
+/models

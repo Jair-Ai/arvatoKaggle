@@ -1,0 +1,15 @@
+artifact_uri: file:///home/jair/Documents/arvato_project/notebooks/mlruns/0/a74e8a719e41448387a064ce22d98762/artifacts
+end_time: 1615069376042
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: a74e8a719e41448387a064ce22d98762
+run_uuid: a74e8a719e41448387a064ce22d98762
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1615069374853
+status: 3
+tags: []
+user_id: jair

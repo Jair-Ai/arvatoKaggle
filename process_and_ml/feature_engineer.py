@@ -25,6 +25,8 @@ def fs_for_cat_part_one(df: pd.DataFrame):
     # Drop After Feature Engineer
     df.drop(['CAMEO_INTL_2015', 'PLZ8_BAUMAX_FAMILY'], axis=1, inplace=True)
 
+    return df
+
 
 def fs_for_cat_part_two(df):
     generations = {0: [1, 2],  # 40s
@@ -127,4 +129,4 @@ def fs_for_cat_boost(df_population: pd.DataFrame, df_customer: pd.DataFrame) -> 
     df_to_model.to_csv(path, single_file=True)
     dataframe_concatenated = pd.read_csv(path)
     return dataframe_concatenated
-    # TODO TERMINAR ESTA PIPELINE DE DADOS E FACILITAR A VIDA NA HORA DE TREINAR O MODELO
+    # TODO pegar o arquivo de testes e deixar com as mesmas colunas do cleaned data

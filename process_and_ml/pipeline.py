@@ -81,7 +81,6 @@ def preprocessing_baseline(df: pd.DataFrame,
     x = df.drop(columns=target)
     y = df[target]
 
-    # TODO IF CAT FEATURES CHECK EACH COLUMN AND TRANFORM TO STR, AFTER SET NAN AS UNKNOWN
     if len(cat_features) > 1:
         x_filled = cat_features_fill_na(x, cat_features=cat_features)
     else:

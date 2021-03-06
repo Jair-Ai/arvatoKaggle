@@ -2,7 +2,7 @@ from json import dump
 from typing import Any
 
 from .projetct_paths import PATH_SUBMISSIONS
-from ..config import settings
+from config import settings
 from kaggle.api.kaggle_api_extended import KaggleApi
 import numpy as np
 import pandas as pd
