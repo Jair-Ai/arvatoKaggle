@@ -66,7 +66,9 @@ def fs_for_cat_part_two(df):
     df['PRAEGENDE_JUGENDJAHRE_MOV'] = df['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
     # azdias_new.loc[:,'PRAEGENDE_JUGENDJAHRE_MOV'] = azdias_new['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
 
-    df.drop('PRAEGENDE_JUGENDJAHRE')
+    df.drop('PRAEGENDE_JUGENDJAHRE', axis=1, inplace=True)
+
+    return df
 
 
 def standardize_binary_columns(df):
@@ -96,7 +98,7 @@ def correlated_columns_to_drop(df, min_corr_level=0.95):
     # Find index of feature columns with correlation greater than min_corr_level
     to_drop = [column for column in upper.columns if any(upper[column] > min_corr_level)]
 
-    return [to_drop, df.drop(to_drop, inplace=True)]
+    return [to_drop, df.drop(to_drop, axis=1, inplace=True)]
 
 
 def confirm_equal_columns_dataframe(df_1, df_2):
