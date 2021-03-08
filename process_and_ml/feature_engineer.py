@@ -1,5 +1,5 @@
 import pandas as pd
-from numba import np
+import numpy as np
 import dask.dataframe as dd
 
 
@@ -14,16 +14,13 @@ def fs_for_cat_part_one(df: pd.DataFrame):
     df['WEALTH'] = [value if pd.isnull(value) else int(str(value)[0]) for value in values_list_df]
     df['LIFE_AGE'] = [value if pd.isnull(value) else int(str(value)[1]) for value in values_list_df]
 
-    # Drop Original column after.
-    df.drop(['CAMEO_INTL_2015'], axis=1, inplace=True)
-
     # Feature Engineer on PLZ8_BAUMAX.
     df['PLZ8_BAUMAX_FAMILY'] = np.where(df['PLZ8_BAUMAX'] == 5, 0, df['PLZ8_BAUMAX'])
     df['PLZ8_BAUMAX_bussiness'] = np.where(df['PLZ8_BAUMAX'] == 5, 1,
                                            np.where(df['PLZ8_BAUMAX'].isnull(), df['PLZ8_BAUMAX'], 0))
 
     # Drop After Feature Engineer
-    df.drop(['CAMEO_INTL_2015', 'PLZ8_BAUMAX_FAMILY'], axis=1, inplace=True)
+    df.drop(['CAMEO_DEUINTL_2015', 'PLZ8_BAUMAX'], axis=1, inplace=True)
 
     return df
 

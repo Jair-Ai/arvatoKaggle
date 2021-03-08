@@ -144,14 +144,22 @@ def preprocessing_baseline(df: pd.DataFrame,
 def compute_metrics(model: Union[Pipeline, CatBoostClassifier],
                     x: pd.DataFrame,
                     y: pd.Series) -> Metrics:
-    """Computes `model` metrics for `X` and
-    `y`
+    """Compute Metrics from a model
+
+    Args:
+        model (Union[Pipeline, CatBoostClassifier]): Machine Learning Model.
+        x (pd.DataFrame): Dataframe for prediction.
+        y: Label.
+
+    Returns:
+        Metrics: NamedTuple with Accuracy and Auc metric.
+
     """
     predict = model.predict(x)
-    predict_proba = model.predict_proba(x)[:, 1]
+    predict_probability = model.predict_proba(x)[:, 1]
 
     acc = accuracy_score(y, predict)
-    auc = roc_auc_score(y, predict_proba)
+    auc = roc_auc_score(y, predict_probability)
 
     return Metrics(ACC=acc, AUC=auc)
 

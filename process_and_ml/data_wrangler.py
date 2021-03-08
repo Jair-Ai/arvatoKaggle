@@ -13,6 +13,7 @@ def load_customers(path, sample_ratio: Optional[float] = None):
         customers = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=settings.RANDOM_STATE)
     else:
         customers = pd.read_csv(path, sep=';')
+
     customers = customers.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
     customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
     return customers

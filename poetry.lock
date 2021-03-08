@@ -1878,7 +1878,7 @@ test = ["ipaddress", "mock", "unittest2", "enum34", "pywin32", "wmi"]
 [[package]]
 category = "main"
 description = "Run a subprocess in a pseudo terminal"
-marker = "sys_platform != \"win32\" or os_name != \"nt\" or python_version >= \"3.3\" and sys_platform != \"win32\""
+marker = "python_version >= \"3.3\" and sys_platform != \"win32\" or sys_platform != \"win32\" or os_name != \"nt\" or python_version >= \"3.3\" and sys_platform != \"win32\" and (python_version >= \"3.3\" and sys_platform != \"win32\" or sys_platform != \"win32\")"
 name = "ptyprocess"
 optional = false
 python-versions = "*"
@@ -2344,6 +2344,31 @@ version = "1.5.0"
 
 [[package]]
 category = "main"
+description = "A unified approach to explain the output of any machine learning model."
+name = "shap"
+optional = false
+python-versions = "*"
+version = "0.39.0"
+
+[package.dependencies]
+cloudpickle = "*"
+numba = "*"
+numpy = "*"
+pandas = "*"
+scikit-learn = "*"
+scipy = "*"
+slicer = "0.0.7"
+tqdm = ">4.25.0"
+
+[package.extras]
+all = ["pyod", "pytest", "sphinx-rtd-theme", "sentencepiece", "transformers", "lightgbm", "torch", "numpydoc", "nbsphinx", "opencv-python", "ipython", "pytest-mpl", "matplotlib", "xgboost", "catboost", "sphinx", "pytest-cov", "pyspark", "lime"]
+docs = ["matplotlib", "ipython", "numpydoc", "sphinx-rtd-theme", "sphinx", "nbsphinx"]
+others = ["lime"]
+plots = ["matplotlib", "ipython"]
+test = ["pytest", "pytest-mpl", "pytest-cov", "xgboost", "lightgbm", "catboost", "pyspark", "pyod", "transformers", "torch", "sentencepiece", "opencv-python"]
+
+[[package]]
+category = "main"
 description = "A generator library for concise, unambiguous and URL-safe UUIDs."
 name = "shortuuid"
 optional = false
@@ -2376,6 +2401,14 @@ version = "0.0"
 
 [package.dependencies]
 scikit-learn = "*"
+
+[[package]]
+category = "main"
+description = "A small package for big slicing."
+name = "slicer"
+optional = false
+python-versions = ">=3.6"
+version = "0.0.7"
 
 [[package]]
 category = "main"
@@ -2743,7 +2776,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "e2993e4125c3ec44ef3a72b991173e2c057f40068607d22e096f398e0c4676c3"
+content-hash = "255adcdb232ae76c18a8695222719e7a4ab5ffd24fc69c544d9cb3f9eb083aa2"
 lock-version = "1.0"
 python-versions = "^3.7.2"
 
@@ -4001,6 +4034,12 @@ send2trash = [
     {file = "Send2Trash-1.5.0-py3-none-any.whl", hash = "sha256:f1691922577b6fa12821234aeb57599d887c4900b9ca537948d2dac34aea888b"},
     {file = "Send2Trash-1.5.0.tar.gz", hash = "sha256:60001cc07d707fe247c94f74ca6ac0d3255aabcb930529690897ca2a39db28b2"},
 ]
+shap = [
+    {file = "shap-0.39.0-cp36-cp36m-win_amd64.whl", hash = "sha256:bf9af9b089ef95cb1ac0df80a43f8144aa9095d10f282cb5c19643ff88a6a79d"},
+    {file = "shap-0.39.0-cp37-cp37m-win_amd64.whl", hash = "sha256:b44f9fbb7349f5406b98b4ec24c672f8fe932606bb7574a8aae2238410c55289"},
+    {file = "shap-0.39.0-cp38-cp38-win_amd64.whl", hash = "sha256:c0d51b44c15eae1c12e51ed498f898cfc5e12d6be7e0d4f733ce6453f6ec85a4"},
+    {file = "shap-0.39.0.tar.gz", hash = "sha256:0196a6c12cc98f8b48ce9c5968550902432b80290da6fa7be8655441a1c6251a"},
+]
 shortuuid = [
     {file = "shortuuid-1.0.1-py3-none-any.whl", hash = "sha256:492c7402ff91beb1342a5898bd61ea953985bf24a41cd9f247409aa2e03c8f77"},
     {file = "shortuuid-1.0.1.tar.gz", hash = "sha256:3c11d2007b915c43bee3e10625f068d8a349e04f0d81f08f5fa08507427ebf1f"},
@@ -4015,6 +4054,10 @@ six = [
 ]
 sklearn = [
     {file = "sklearn-0.0.tar.gz", hash = "sha256:e23001573aa194b834122d2b9562459bf5ae494a2d59ca6b8aa22c85a44c0e31"},
+]
+slicer = [
+    {file = "slicer-0.0.7-py3-none-any.whl", hash = "sha256:0b94faa5251c0f23782c03f7b7eedda91d80144059645f452c4bc80fab875976"},
+    {file = "slicer-0.0.7.tar.gz", hash = "sha256:f5d5f7b45f98d155b9c0ba6554fa9770c6b26d5793a3e77a1030fb56910ebeec"},
 ]
 smmap = [
     {file = "smmap-3.0.5-py2.py3-none-any.whl", hash = "sha256:7bfcf367828031dc893530a29cb35eb8c8f2d7c8f2d0989354d75d24c8573714"},
