@@ -35,7 +35,8 @@ class DataSplitsSizeException(Exception):
 
 
 def cat_features_fill_na(df: pd.DataFrame,
-                         cat_features: List[str]) -> pd.DataFrame:
+                         cat_features: List[str],
+                         wrangler: bool = False) -> pd.DataFrame:
     """Fills NA values for each column in `cat_features` for
     `df` dataframe
     """
@@ -44,7 +45,7 @@ def cat_features_fill_na(df: pd.DataFrame,
     data_types_bool = {key: {isinstance(item, (int, str)) for item in df[key].value_counts().index.tolist()} for
                        key in cat_features}
     for cat in cat_features:
-        if len(data_types_bool[cat]) > 1:
+        if len(data_types_bool[cat]) > 1 and wrangler:
             df_copy[cat] = pd.to_numeric(df_copy[cat], downcast='signed')
             df_copy[cat] = df_copy[cat].apply(lambda x: int(x) if not np.isnan(x) else '')
             df_copy[cat] = np.where(df_copy[cat] == '', np.nan, df_copy[cat])

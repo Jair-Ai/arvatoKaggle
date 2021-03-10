@@ -6,13 +6,14 @@ import pandas as pd
 import numpy as np
 
 from config import settings
+from helpers.projetct_paths import NA_VALUES
 
 
 def load_customers(path, sample_ratio: Optional[float] = None):
     if sample_ratio:
-        customers = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=settings.RANDOM_STATE)
+        customers = pd.read_csv(path, sep=';', na_values=NA_VALUES).sample(frac=sample_ratio, random_state=settings.RANDOM_STATE)
     else:
-        customers = pd.read_csv(path, sep=';')
+        customers = pd.read_csv(path, sep=';', na_values=NA_VALUES)
 
     customers = customers.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
     customers.drop(['PRODUCT_GROUP', 'CUSTOMER_GROUP', 'ONLINE_PURCHASE'], axis=1, inplace=True)
@@ -21,9 +22,9 @@ def load_customers(path, sample_ratio: Optional[float] = None):
 
 def load_azdias(path, sample_ratio: Optional[float] = None):
     if sample_ratio:
-        azdias = pd.read_csv(path, sep=';').sample(frac=sample_ratio, random_state=settings.RANDOM_STATE)
+        azdias = pd.read_csv(path, sep=';', na_values=NA_VALUES).sample(frac=sample_ratio, random_state=settings.RANDOM_STATE)
     else:
-        azdias = pd.read_csv(path, sep=';')
+        azdias = pd.read_csv(path, sep=';', na_values=NA_VALUES)
     azdias = azdias.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
     return azdias
 
