@@ -54,7 +54,7 @@ class CatPipeline:
         self.X_train, self.X_test, self.X_valid = self.features
         self.y_train, self.y_test, self.y_valid = self.labels
 
-        self.class_weights = (1, sum(y_train == 0) / sum(y_train == 1))
+        self.class_weights = (1, sum(self.y_train == 0) / sum(self.y_train == 1))
 
     def predict_test(self, test_df: pd.DataFrame):
         lnr = test_df['LNR']

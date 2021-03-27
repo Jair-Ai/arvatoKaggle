@@ -30,7 +30,7 @@ def load_azdias(path, sample_ratio: Optional[float] = None):
 
 
 def load_test_file(path):
-    df_test = pd.read_csv(path, sep=';')
+    df_test = pd.read_csv(path, sep=';', na_values=NA_VALUES)
     df_test = df_test.rename(columns={'CAMEO_INTL_2015': 'CAMEO_DEUINTL_2015'})
     lnr_for_kaggle = df_test['LNR']
     df_test.drop('LNR', axis=1, inplace=True)

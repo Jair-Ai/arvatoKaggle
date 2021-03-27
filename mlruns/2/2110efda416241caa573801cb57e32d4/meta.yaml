@@ -1,0 +1,15 @@
+artifact_uri: ../mlruns/2/2110efda416241caa573801cb57e32d4/artifacts
+end_time: 1616752393588
+entry_point_name: ''
+experiment_id: '2'
+lifecycle_stage: active
+name: ''
+run_id: 2110efda416241caa573801cb57e32d4
+run_uuid: 2110efda416241caa573801cb57e32d4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1616752390882
+status: 3
+tags: []
+user_id: jair
