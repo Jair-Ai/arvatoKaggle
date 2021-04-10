@@ -17,16 +17,13 @@ matplotlib = "^3.3.4"
 seaborn = "^0.11.1"
 opencensus = "^0.7.12"
 pandas = "^1.2.2"
-boto3 = "^1.17.6"
 catboost = "^0.24.4"
-pyarrow = "^3.0.0"
-dask = {extras = ["complete"], version = "^2021.2.0"}
-dask-ml = {extras = ["complete"], version = "^1.8.0"}
 kaggle = "^1.5.10"
 dvc = "^1.11.16"
 dynaconf = "^3.1.2"
 mlflow = "^1.14.1"
 shap = "^0.39.0"
+modin = {extras = ["all"], version = "^0.9.1"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"

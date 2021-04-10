@@ -2,7 +2,7 @@ import os
 from typing import Dict, List, Optional
 import logging
 import json
-import pandas as pd
+import modin.pandas as pd
 import numpy as np
 
 from config import settings
