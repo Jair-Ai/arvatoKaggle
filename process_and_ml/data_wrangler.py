@@ -111,6 +111,7 @@ class CleanUp:
         cod_nan = pd.read_csv(path)
         cod_nan.drop(cod_nan.columns[0], axis=1, inplace=True)
         cod_nan.set_index('Attribute', inplace=True)
+        print(cod_nan.head())
         self.dict_to_nan = cod_nan.to_dict()['Value']
         self.dict_to_nan['CAMEO_DEU_2015'] = [-1, 'XX']
         self.dict_to_nan['CAMEO_DEUINTL_2015'] = [-1, 'XX']

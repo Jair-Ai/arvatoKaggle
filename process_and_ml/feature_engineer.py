@@ -1,9 +1,8 @@
-import pandas as pd
+import modin.pandas as pd
 import numpy as np
-import dask.dataframe as dd
 
 
-def fs_for_cat_part_one(df: pd.DataFrame):
+def fs_new_cols(df: pd.DataFrame):
     df['WOHNLAGE'].replace(0, np.nan)
 
     # Saving values on lists to create new columns from CAMEO_INTL_2015.
@@ -16,16 +15,18 @@ def fs_for_cat_part_one(df: pd.DataFrame):
 
     # Feature Engineer on PLZ8_BAUMAX.
     df['PLZ8_BAUMAX_FAMILY'] = np.where(df['PLZ8_BAUMAX'] == 5, 0, df['PLZ8_BAUMAX'])
-    df['PLZ8_BAUMAX_bussiness'] = np.where(df['PLZ8_BAUMAX'] == 5, 1,
+    df['PLZ8_BAUMAX_BUSSINESS'] = np.where(df['PLZ8_BAUMAX'] == 5, 1,
                                            np.where(df['PLZ8_BAUMAX'].isnull(), df['PLZ8_BAUMAX'], 0))
 
     # Drop After Feature Engineer
     df.drop(['CAMEO_DEUINTL_2015', 'PLZ8_BAUMAX'], axis=1, inplace=True)
-
+    print("Created WEALTH and LIFE_AGE column from 'CAMEO_DEUINTL_2015', original column was droped")
+    print("Created 'PLZ8_BAUMAX_BUSSINESS' and 'PLZ8_BAUMAX_FAMILY' from 'PLZ8_BAUMAX_FAMILY', original column was "
+          "droped.")
     return df
 
 
-def fs_for_cat_part_two(df):
+def fs_generation(df):
     generations = {0: [1, 2],  # 40s
                    1: [3, 4],  # 50s
                    2: [5, 6, 7],  # 60s
@@ -64,7 +65,7 @@ def fs_for_cat_part_two(df):
     # azdias_new.loc[:,'PRAEGENDE_JUGENDJAHRE_MOV'] = azdias_new['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
 
     df.drop('PRAEGENDE_JUGENDJAHRE', axis=1, inplace=True)
-
+    print("Created 'PRAEGENDE_JUGENDJAHRE_GEN' and 'PRAEGENDE_JUGENDJAHRE_MOV' from 'PRAEGENDE_JUGENDJAHRE', original column was droped.")
     return df
 
 
@@ -102,30 +103,8 @@ def confirm_equal_columns_dataframe(df_1, df_2):
     return set(df_1).difference(df_2)
 
 
-def fs_pipeline_stage_one(df):
+"""def fs_pipeline_stage_one(df):
     ...
     # df = fs_pipeline_stage_one(df)
     # df =
-
-
-def fs_for_cat_boost(df_population: pd.DataFrame, df_customer: pd.DataFrame) -> pd.DataFrame:
-    """Function to concatenate dataframe in any size.
-    
-    Args:
-        df_population: azdias dataframe, ll have new column as customer=0
-        df_customer: customer dataframe, ll have new column as customer=1
-
-    Returns:
-        
-
-    """""
-
-    df_to_model = dd.concat(
-        [dd.from_pandas(df_customer.assign(is_customer=1), npartitions=10),
-         dd.from_pandas(df_population.assign(is_customer=0), npartitions=10)]
-    )
-    path = '../data/cat_dfs/df_concat_pop_and_customer.csv'
-    df_to_model.to_csv(path, single_file=True)
-    dataframe_concatenated = pd.read_csv(path)
-    return dataframe_concatenated
-    # TODO pegar o arquivo de testes e deixar com as mesmas colunas do cleaned data
+"""
