@@ -96,7 +96,8 @@ def correlated_columns_to_drop(df, min_corr_level=0.95):
     # Find index of feature columns with correlation greater than min_corr_level
     to_drop = [column for column in upper.columns if any(upper[column] > min_corr_level)]
 
-    return [to_drop, df.drop(to_drop, axis=1, inplace=True)]
+    df_with_no_corr = df.drop(to_drop, axis=1)
+    return [to_drop, df_with_no_corr]
 
 
 def confirm_equal_columns_dataframe(df_1, df_2):
