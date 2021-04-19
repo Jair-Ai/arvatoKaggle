@@ -24,6 +24,8 @@ dynaconf = "^3.1.2"
 mlflow = "^1.14.1"
 shap = "^0.39.0"
 modin = {extras = ["all"], version = "^0.9.1"}
+dask-ml = "^1.8.0"
+dask = {version = "2.19.0", extras = ["dataframe"]}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"
