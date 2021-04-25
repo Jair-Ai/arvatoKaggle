@@ -1,4 +1,4 @@
-import modin.pandas as pd
+import pandas as pd
 import numpy as np
 
 
@@ -65,7 +65,8 @@ def fs_generation(df):
     # azdias_new.loc[:,'PRAEGENDE_JUGENDJAHRE_MOV'] = azdias_new['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
 
     df.drop('PRAEGENDE_JUGENDJAHRE', axis=1, inplace=True)
-    print("Created 'PRAEGENDE_JUGENDJAHRE_GEN' and 'PRAEGENDE_JUGENDJAHRE_MOV' from 'PRAEGENDE_JUGENDJAHRE', original column was droped.")
+    print(
+        "Created 'PRAEGENDE_JUGENDJAHRE_GEN' and 'PRAEGENDE_JUGENDJAHRE_MOV' from 'PRAEGENDE_JUGENDJAHRE', original column was droped.")
     return df
 
 
@@ -104,8 +105,17 @@ def confirm_equal_columns_dataframe(df_1, df_2):
     return set(df_1).difference(df_2)
 
 
-"""def fs_pipeline_stage_one(df):
-    ...
-    # df = fs_pipeline_stage_one(df)
-    # df =
-"""
+def remove_kba(df):
+    kba_cols = df.columns[df.columns.str.startswith('KBA05')]
+    df.drop(list(kba_cols), axis='columns', inplace=True)
+    return df
+
+
+def fs_pipeline_stage_one(df):
+    df = fs_new_cols(df)
+    df = fs_generation(df)
+    df = standardize_binary_columns(df)
+    corr_result = correlated_columns_to_drop(df)
+    df = remove_kba(corr_result[1])
+    return df
+
