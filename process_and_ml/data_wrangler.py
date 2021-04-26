@@ -130,7 +130,7 @@ class CleanUp:
             self.load_nan_info(path)
         for key, value, in self.dict_to_nan.items():
             if key in df:
-                df[key] = df[key].replace(value, np.nan)
+                df.loc[:, key] = df[key].replace(value, np.nan)
             else:
                 columns_not_in['no_value_to_replace'].append(key)
         return df, columns_not_in

@@ -10,12 +10,12 @@ def fs_new_cols(df: pd.DataFrame):
 
     # Creating columns from CAMEO_INTL_2015 column.
 
-    df['WEALTH'] = [value if pd.isnull(value) else int(str(value)[0]) for value in values_list_df]
-    df['LIFE_AGE'] = [value if pd.isnull(value) else int(str(value)[1]) for value in values_list_df]
+    df.loc[:, 'WEALTH'] = [value if pd.isnull(value) else int(str(value)[0]) for value in values_list_df]
+    df.loc[:, 'LIFE_AGE'] = [value if pd.isnull(value) else int(str(value)[1]) for value in values_list_df]
 
     # Feature Engineer on PLZ8_BAUMAX.
-    df['PLZ8_BAUMAX_FAMILY'] = np.where(df['PLZ8_BAUMAX'] == 5, 0, df['PLZ8_BAUMAX'])
-    df['PLZ8_BAUMAX_BUSSINESS'] = np.where(df['PLZ8_BAUMAX'] == 5, 1,
+    df.loc[:, 'PLZ8_BAUMAX_FAMILY'] = np.where(df['PLZ8_BAUMAX'] == 5, 0, df['PLZ8_BAUMAX'])
+    df.loc[:, 'PLZ8_BAUMAX_BUSSINESS'] = np.where(df['PLZ8_BAUMAX'] == 5, 1,
                                            np.where(df['PLZ8_BAUMAX'].isnull(), df['PLZ8_BAUMAX'], 0))
 
     # Drop After Feature Engineer
@@ -57,11 +57,11 @@ def fs_generation(df):
             return np.nan
 
     # Engineer generation column
-    df['PRAEGENDE_JUGENDJAHRE_GEN'] = df['PRAEGENDE_JUGENDJAHRE'].apply(classify_generation)
+    df.loc[:, 'PRAEGENDE_JUGENDJAHRE_GEN'] = df['PRAEGENDE_JUGENDJAHRE'].apply(classify_generation)
     # azdias.loc[:,'PRAEGENDE_JUGENDJAHRE_GEN'] = azdias['PRAEGENDE_JUGENDJAHRE'].apply(classify_generation)
 
     # Engineer movement column
-    df['PRAEGENDE_JUGENDJAHRE_MOV'] = df['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
+    df.loc[:, 'PRAEGENDE_JUGENDJAHRE_MOV'] = df['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
     # azdias_new.loc[:,'PRAEGENDE_JUGENDJAHRE_MOV'] = azdias_new['PRAEGENDE_JUGENDJAHRE'].apply(classify_movement)
 
     df.drop('PRAEGENDE_JUGENDJAHRE', axis=1, inplace=True)
@@ -72,9 +72,9 @@ def fs_generation(df):
 
 def standardize_binary_columns(df):
     print("Working on Binary columns.")
-    df['OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
-    df['VERS_TYP'].replace([2.0, 1.0], [1, 0], inplace=True)
-    df['ANREDE_KZ'].replace([2, 1], [1, 0], inplace=True)
+    df.loc[:, 'OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
+    df.loc[:, 'VERS_TYP'].replace([2.0, 1.0], [1, 0], inplace=True)
+    df.loc[:, 'ANREDE_KZ'].replace([2, 1], [1, 0], inplace=True)
     return df
 
 
@@ -117,14 +117,15 @@ def remove_kba(df):
 def categorize_columns(df):
     print("Get_Dummies with pandas")
     CATEGORICAL_COLUMNS = df.select_dtypes(include=['category', 'object']).columns.to_list()
+    print(f"Get_Dummies with pandas cat column = {CATEGORICAL_COLUMNS}")
     return pd.get_dummies(df, columns=CATEGORICAL_COLUMNS)
 
 
-def fs_pipeline_stage_one(df):
+def fs_pipeline(df):
     df = fs_new_cols(df)
     df = fs_generation(df)
     df = standardize_binary_columns(df)
-    corr_result = correlated_columns_to_drop(df)
-    df = remove_kba(corr_result[1])
+    print(f"Shape Before Remove KBA -> {df.shape}")
+    df = remove_kba(df)
     df = categorize_columns(df)
     return df
