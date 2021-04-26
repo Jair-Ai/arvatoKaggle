@@ -71,6 +71,7 @@ def fs_generation(df):
 
 
 def standardize_binary_columns(df):
+    print("Working on Binary columns.")
     df['OST_WEST_KZ'].replace(['O', 'W'], [0, 1], inplace=True)
     df['VERS_TYP'].replace([2.0, 1.0], [1, 0], inplace=True)
     df['ANREDE_KZ'].replace([2, 1], [1, 0], inplace=True)
@@ -87,7 +88,7 @@ def correlated_columns_to_drop(df, min_corr_level=0.95):
     Returns:
         List[List[str], pd.DataFrame]: List with columns dropped, and dataframe without this columns.
     """
-
+    print("Removing Correlated columns.")
     # Create correlation matrix
     corr_matrix = df.corr().abs()
 
@@ -98,6 +99,7 @@ def correlated_columns_to_drop(df, min_corr_level=0.95):
     to_drop = [column for column in upper.columns if any(upper[column] > min_corr_level)]
 
     df_with_no_corr = df.drop(to_drop, axis=1)
+
     return [to_drop, df_with_no_corr]
 
 
@@ -106,9 +108,16 @@ def confirm_equal_columns_dataframe(df_1, df_2):
 
 
 def remove_kba(df):
+    print("Removing KBA05 columns")
     kba_cols = df.columns[df.columns.str.startswith('KBA05')]
     df.drop(list(kba_cols), axis='columns', inplace=True)
     return df
+
+
+def categorize_columns(df):
+    print("Get_Dummies with pandas")
+    CATEGORICAL_COLUMNS = df.select_dtypes(include=['category', 'object']).columns.to_list()
+    return pd.get_dummies(df, columns=CATEGORICAL_COLUMNS)
 
 
 def fs_pipeline_stage_one(df):
@@ -117,5 +126,5 @@ def fs_pipeline_stage_one(df):
     df = standardize_binary_columns(df)
     corr_result = correlated_columns_to_drop(df)
     df = remove_kba(corr_result[1])
+    df = categorize_columns(df)
     return df
-

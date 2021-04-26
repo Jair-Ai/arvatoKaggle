@@ -3,8 +3,6 @@ import glob
 import os
 import boto3
 import sagemaker
-import pandas as pd
-import numpy as np
 
 
 class WhereIs:
@@ -29,14 +27,3 @@ class WhereIs:
     @property
     def get_paths_list(self) -> List[str]:
         return self.object_list_content
-
-
-
-
-
-# def pipeline(self, threshold: float):
-#     self.drop_initial_columns()
-#     self.create_nan_dict()
-#     self.drop_columns_nan(threshold)
-#     self.feature_engineer()
-#     self.working_with_categorical_values()

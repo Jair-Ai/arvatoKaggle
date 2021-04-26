@@ -23,10 +23,12 @@ dvc = "^1.11.16"
 dynaconf = "^3.1.2"
 mlflow = "^1.14.1"
 shap = "^0.39.0"
-modin = {extras = ["all"], version = "^0.9.1"}
 dask-ml = "^1.8.0"
 dask = {version = "2.19.0", extras = ["dataframe"]}
 yellowbrick = "^1.3.post1"
+boto3 = "^1.17.57"
+sagemaker = "^2.38.0"
+pyarrow = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"

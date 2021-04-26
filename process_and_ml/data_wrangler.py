@@ -2,7 +2,7 @@ import os
 from typing import Dict, List, Optional
 import logging
 import json
-import modin.pandas as pd
+import pandas as pd
 import numpy as np
 
 from config import settings
@@ -56,9 +56,6 @@ class CleanUp:
         """
 
         self.columns_not_in = {'azdias': [], 'customers': []}
-        self.columns_to_drop = {'D19_LETZTER_KAUF_BRANCHE': 'Other columns name, no descriptions',
-                                'EINGEFUEGT_AM': 'No information about, data as input', 'LNR': 'Client Number',
-                                'CAMEO_DEUG_2015': 'Too Many Values'}
         self.paths: List[str] = paths
         self.path_columns_to_info = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                  "../data/cleaned_data/columns_to_keep.json")
@@ -194,5 +191,5 @@ class CleanUp:
             dfs_cleaner[key], _ = self.set_unknown_value_as_nan(dfs_cleaner[key])
 
         return dfs_cleaner
-    # TODO: Test on test file and train file
-    # TODO: Check the columns of cleaned azdias em compare with datawrangler.
+    # TODO: Verificar por que tem diferença entre azdias e customers
+
