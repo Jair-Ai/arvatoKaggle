@@ -29,6 +29,7 @@ yellowbrick = "^1.3.post1"
 boto3 = "^1.17.57"
 sagemaker = "^2.38.0"
 pyarrow = "^3.0.0"
+bayesian-optimization = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"

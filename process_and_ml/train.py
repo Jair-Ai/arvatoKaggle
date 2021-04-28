@@ -3,6 +3,7 @@ from typing import Optional
 
 import mlflow
 import pandas as pd
+import numpy as np
 from sklearn.metrics import roc_auc_score
 
 from process_and_ml.ml_flow_control import create_experiment
@@ -20,6 +21,17 @@ Features = namedtuple('Features', 'X_train X_test X_valid')
 Labels = namedtuple('Labels', 'y_train y_test y_valid')
 
 
+def evaluate(label, trained_model, pred=None):
+    prediction = trained_model.predict_proba(pred)
+    acc = trained_model.predict(pred)
+
+    roc_pred = roc_auc_score(label, prediction[:1])
+
+    print(f'Prediction accuracy = {acc}')
+    print(f'Prediction roc = {roc_pred} !')
+    return prediction[:1], roc_pred, acc
+
+
 def update_weights(x, y, d19):
     ...
 
@@ -31,7 +43,6 @@ class CatPipeline:
         self.label = label
         self.features = None
         self.labels = None
-        self.trained_model = False
         self.model = None
         self.class_weights = None
         self.X_train = None
@@ -62,7 +73,7 @@ class CatPipeline:
         test_df_cleaned = cat_features_fill_na(test_df.drop(columns=['LNR'], errors='ignore'),
                                                cat_features=self.cat_features)
 
-        return self.evaluate(lnr, test_df_cleaned)
+        return evaluate(lnr, test_df_cleaned)
 
     def train(self, model, params, tags, run_name: Optional[str], experiment_name: str):
         self.model = model(**params)
@@ -75,12 +86,28 @@ class CatPipeline:
             self.metrics_returned = show_metrics_baseline(self.model, features=self.features, labels=self.labels)
             mlflow.log_metrics(self.metrics_returned)
 
-    def evaluate(self, label, pred):
-        prediction = self.model.predict_proba(pred)
-        acc = self.model.predict(pred)
 
-        roc_pred = roc_auc_score(label, prediction[:1])
+class TrainAfterPipeline:
 
-        print(f'Prediction accuracy = {acc}')
-        print(f'Prediction roc = {roc_pred} !')
-        return prediction[:1], roc_pred, acc
+    def __init__(self, dataset: np.array, label: np.array):
+        self.df = df
+        self.label = label
+        self.trained_model = False
+        self.model = None
+        self.X_train = None
+        self.y_train = None
+        self.X_test = None
+        self.y_test = None
+        self.metrics_returned = None
+
+    def train(self, model, params: Dict[str, Union[str, float]], tags: Dict[str, str], run_name: Optional[str],
+              experiment_name: str):
+        self.model = model(**params)
+
+        experiment_id = create_experiment(experiment_name=experiment_name)
+
+        with mlflow.start_run(tags=tags, run_name=run_name, experiment_id=experiment_id):
+            mlflow.log_params(params)
+            self.model.fit(self.X_train, self.y_train, eval_set=(self.X_valid, self.y_valid), verbose=False)
+            self.metrics_returned = show_metrics_baseline(self.model, features=self.features, labels=self.labels)
+            mlflow.log_metrics(self.metrics_returned)
