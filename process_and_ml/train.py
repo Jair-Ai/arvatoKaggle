@@ -1,12 +1,15 @@
 from collections import namedtuple
-from typing import Optional
+from typing import Optional, Union, Dict, List
 
 import mlflow
 import pandas as pd
 import numpy as np
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import RepeatedStratifiedKFold, GridSearchCV, cross_val_predict, train_test_split
 
+from config import settings
 from process_and_ml.ml_flow_control import create_experiment
+from process_and_ml.models import compute_metrics
 from process_and_ml.pipeline import preprocessing_baseline, cat_features_fill_na, show_metrics_baseline
 from pathlib import Path
 
@@ -30,6 +33,26 @@ def evaluate(label, trained_model, pred=None):
     print(f'Prediction accuracy = {acc}')
     print(f'Prediction roc = {roc_pred} !')
     return prediction[:1], roc_pred, acc
+
+
+def log_best(run: mlflow.entities.Run,
+             metric: str) -> None:
+    """Log the best parameters from optimization to the parent experiment.
+
+    Args:
+        run: current run to log metrics
+        metric: name of metric to select best and log
+    """
+
+    client = mlflow.tracking.MlflowClient()
+    runs = client.search_runs(
+        [run.info.experiment_id],
+        "tags.mlflow.parentRunId = '{run_id}' ".format(run_id=run.info.run_id))
+
+    best_run = min(runs, key=lambda run: run.data.metrics[metric])
+
+    mlflow.set_tag("best_run", best_run.info.run_id)
+    mlflow.log_metric(f"best_{metric}", best_run.data.metrics[metric])
 
 
 def update_weights(x, y, d19):
@@ -90,24 +113,40 @@ class CatPipeline:
 class TrainAfterPipeline:
 
     def __init__(self, dataset: np.array, label: np.array):
-        self.df = df
+        self.dataset = dataset
         self.label = label
         self.trained_model = False
-        self.model = None
         self.X_train = None
         self.y_train = None
         self.X_test = None
         self.y_test = None
-        self.metrics_returned = None
 
-    def train(self, model, params: Dict[str, Union[str, float]], tags: Dict[str, str], run_name: Optional[str],
-              experiment_name: str):
-        self.model = model(**params)
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.dataset, self.label.values,
+                                                                                random_state=settings.RANDOM_STATE,
+                                                                                test_size=0.3)
+
+    def train_grid_search(self, model, grid: Dict[str, Union[str, float, List[Union[str, int, float]]]]):
+        cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=3, random_state=settings.RandomState)
+        grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='roc_auc',
+                                   error_score=0)
+
+        grid_result = grid_search.fit()
+
+        print(grid_result.best_score_)
+        print(grid_result.best_estimator_)
+        compute_metrics(grid_result.best_estimator_, self.X_test, self.y_test)
+
+        return grid_result
+
+    def train(self, model, params, tags, run_name: Optional[str], experiment_name: str):
+        model = model(**params)
 
         experiment_id = create_experiment(experiment_name=experiment_name)
 
         with mlflow.start_run(tags=tags, run_name=run_name, experiment_id=experiment_id):
             mlflow.log_params(params)
-            self.model.fit(self.X_train, self.y_train, eval_set=(self.X_valid, self.y_valid), verbose=False)
-            self.metrics_returned = show_metrics_baseline(self.model, features=self.features, labels=self.labels)
-            mlflow.log_metrics(self.metrics_returned)
+            model.fit(self.X_train, self.y_train)
+            metrics_returned = compute_metrics(self.X_test, self.y_test)
+            mlflow.log_metrics(metrics_returned)
+
+        return model
