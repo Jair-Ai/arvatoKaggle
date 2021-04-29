@@ -78,7 +78,28 @@ After That I did some transforms using sklearn pipeline and Column Transform:
 ![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/transform_pipeline.png)
 
 
-I use also PCA, KNN for feature selection.
+I use also PCA;
+We have 97% of explicability with 160 features
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/pca.png)
+
+And we can understand better the data here [Jupyter Notebook](https://github.com/Jair-Ai/arvatoKaggle/blob/master/notebooks/analyse_one.ipynb)
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/pca_2.png)
+
+And Knn for feature selection:
+
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/knn_elbow.png)
+
+
+
+
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/knn_2.png)
+
+
+
+But with 4 cluster we have a very good distance between the centroids.
+
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/knn_3.png)
+
 
 For Supervised learning i used catboost and  adaboost, and Logistic Regression with GridSearchCV.
 
