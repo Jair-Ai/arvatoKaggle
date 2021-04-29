@@ -41,3 +41,6 @@ Now that you've created a model to predict which individuals are most likely to 
 Your entry to the competition should be a CSV file with two columns. The first column should be a copy of "LNR", which acts as an ID number for each individual in the "TEST" partition. The second column, "RESPONSE", should be some measure of how likely each individual became a customer – this might not be a straightforward probability. As you should have found in Part 2, there is a large output class imbalance, where most individuals did not respond to the mailout. Thus, predicting individual classes and using accuracy does not seem to be an appropriate performance evaluation method. Instead, the competition will be using AUC to evaluate performance. The exact values of the "RESPONSE" column do not matter as much: only that the higher values try to capture as many of the actual customers as possible, early in the ROC curve sweep.
 
 ![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/best_result_kaggle.png)
+
+
+### Proposal -> ![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/Report%20for%20Arvato%20Financial%20Solutions%20Proposal.pdf)
