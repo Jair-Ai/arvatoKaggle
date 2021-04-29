@@ -20,6 +20,7 @@ We have train, test dataset too, but all 4 datasets have a serious problem with 
 The most interesting thing about this project is that it is a real problem, and we can violate it in any company,
 besides that having a good result can generate high profitability for the company
 
+It was hard to deal with all data, heavy for the memory.
 
 ### Data and Inputs
 
@@ -47,4 +48,16 @@ The goal is to create a model or model pipeline to understand what's the change 
 ### Metrics
 
 Measuring Performance: AUC (AUROC)
-![alt text](![alt text](https://glassboxmedicine.files.wordpress.com/2019/02/roc-curve-v2.png)
+![alt text](https://glassboxmedicine.files.wordpress.com/2019/02/roc-curve-v2.png)
+
+### Analyses
+
+I used Azdias dataset to make analyses
+
+Most of the columns have less than 20% missing values.
+I drop those columns that have greater than 20% missing values
+And below graph shows the top 50 names of columns along with its missing percent.
+
+![alt text](https://glassboxmedicine.files.wordpress.com/2019/02/roc-curve-v2.png)
+
+
