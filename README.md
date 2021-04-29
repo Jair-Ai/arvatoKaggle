@@ -49,3 +49,21 @@ Your entry to the competition should be a CSV file with two columns. The first c
 
 
 ### Proposal -> ![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/Report%20for%20Arvato%20Financial%20Solutions%20Proposal.pdf)
+
+
+------
+
+## Development
+### Useful commands:
+
+If you dont have poetry on you machine click bellow to official instalation guide:
+![alt text](https://python-poetry.org/docs/#installation)
+Installing dependencies:
+```bash
+poetry install
+```
+
+Format files:
+```bash
+yapf -i -r --style google --no-local-style -p -vv . --exclude '.venv/*' --exclude '.tox/*'
+```
