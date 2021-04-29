@@ -121,16 +121,15 @@ class TrainAfterPipeline:
         self.X_test = None
         self.y_test = None
 
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.dataset, self.label.values,
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.dataset, self.label.values,
                                                                                 random_state=settings.RANDOM_STATE,
                                                                                 test_size=0.3)
 
     def train_grid_search(self, model, grid: Dict[str, Union[str, float, List[Union[str, int, float]]]]):
-        cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=3, random_state=settings.RandomState)
-        grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='roc_auc',
-                                   error_score=0)
+        cv = RepeatedStratifiedKFold(n_splits=20, n_repeats=3, random_state=settings.RANDOM_STATE)
+        grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='roc_auc', verbose=2)
 
-        grid_result = grid_search.fit()
+        grid_result = grid_search.fit(self.X_train, self.y_train)
 
         print(grid_result.best_score_)
         print(grid_result.best_estimator_)
@@ -138,15 +137,21 @@ class TrainAfterPipeline:
 
         return grid_result
 
-    def train(self, model, params, tags, run_name: Optional[str], experiment_name: str):
+    def train(self, model, params, tags, run_name: Optional[str], experiment_name: str, data: Optional[Dict[str, np.array]]=None):
         model = model(**params)
 
         experiment_id = create_experiment(experiment_name=experiment_name)
 
+        if not data:
+            x = self.X_train
+            y = self.y_train
+        else:
+            x = data['x']
+            y = data['y']
         with mlflow.start_run(tags=tags, run_name=run_name, experiment_id=experiment_id):
             mlflow.log_params(params)
-            model.fit(self.X_train, self.y_train)
-            metrics_returned = compute_metrics(self.X_test, self.y_test)
-            mlflow.log_metrics(metrics_returned)
+            model.fit(x, y)
+            split_acc, split_auc = compute_metrics(model, self.X_test, self.y_test)
+            mlflow.log_metrics({'acc': split_acc, 'auc': split_auc})
 
         return model
