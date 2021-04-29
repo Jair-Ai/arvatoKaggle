@@ -123,7 +123,7 @@ I created and applied 5 different pipelines to pre- processing data:
     5- Supervised Learning -> train.py.
 
     
-###Implementation
+### Implementation
 
 After create pipelines i start to train using this  [Jupyter Notebook](https://github.com/Jair-Ai/arvatoKaggle/blob/master/notebooks/supervised_learning.ipynb)
  I think i documented everything very well
