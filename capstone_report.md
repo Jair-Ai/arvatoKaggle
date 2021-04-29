@@ -61,3 +61,79 @@ And below graph shows the top 50 names of columns along with its missing percent
 ![alt text](https://glassboxmedicine.files.wordpress.com/2019/02/roc-curve-v2.png)
 
 
+I also removed any columns that are not in attr or info dataframe.
+
+After that we moved to 243 columns, better than 366.
+
+After that I did a lot of transformation in different columns, and create a pipeline for feature selection,
+you can check here -> ![alt text](https://glassboxmedicine.files.wordpress.com/2019/02/roc-curve-v2.png)
+
+
+### Algorithms and Techniques
+
+First I apply catboost to discovery the feature importance and after that I saw 80 of values = 1 in D19_SOZIALES are customers.
+Unfortunately I don't have description for these columns. I can use later to reach better results.
+
+After That I did some transforms using sklearn pipeline and Column Transform:
+![alt text](imagem do transform)
+
+
+I use also PCA, KNN for feature selection.
+
+For Supervised learning i used catboost and  adaboost, and Logistic Regression with GridSearchCV.
+
+
+### BenchMark Model
+
+Kaggle learboard was my benchmark, i dont have so many time to try, but i did 18 attempsts and the best result was using D19_SOZIALES
+on features
+
+
+### Methodology
+
+#### DataPreprocessing
+I created a dataframe with all null vales from info and attr dataframe, we 0,-1,X,XX and sometime 9 or 10 in some columns.
+
+I created and applied 5 different pipelines to pre- processing data:
+    1- Data Wrangler Pipeline -> data_wrangler.py.
+    2- Feature Engineer Pipeline -> feature_engineer.py.
+    3- Preparing for unsupervised -> models/unsupervised_transform.joblib.
+    4- Unsupervised Learning pipe -> models/unsupervised_transform.joblib.
+    5- Supervised Learning -> train.py.
+
+    
+###Implementation
+
+After create pipelines i start to train using this  [Jupyter Notebook](https://github.com/Jair-Ai/arvatoKaggle/blob/master/notebooks/supervised_learning.ipynb)
+ I think i documented everything very well
+
+### Refinement
+
+I trid to use Hyperopt for bayesian hyperparameters tuning, but i did't had time to finish it with mlfow, so i used GridSearchCV
+with RepeatedStratifiedKFold, to find the best algo.
+Also i did some test with the most importante feature D19_SOZIALES, but i did't had time to make reports with that.
+Was hard to work with this amount of data, my computer crashed a lot of times.
+
+### Results
+
+#### Model Evaluation and Validation
+
+I used Mflow to track the improvements, it worked very well, and could document the features n of columns and dataset used.
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/mlflow_exemple.png)
+
+#### Justification
+My final solution is still catboost with all features. the pipeline transformation show me a lot of data interpretation,
+but I couldn't find anything to beate Catboost
+
+
+### Conclusion
+
+It was a little disappointing to make so many transformations, understand the data and have such a bad result even with Gridserchcv,
+50%, nothing better than random walk, while catboost proved to be very efficient, doing a wonderful job.
+
+#### Refection
+I think in the real life I can do a better work with the features if I have more time using cluster with feature importance,
+and using bayesian method to improve and find better hyper parameters.
+Was a great project, kind of hard because I had this dirty data, and need a good computer power to process everything well.
+But 79.9% is not so bad, isn't?
+
