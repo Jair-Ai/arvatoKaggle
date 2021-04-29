@@ -58,15 +58,15 @@ Most of the columns have less than 20% missing values.
 I drop those columns that have greater than 20% missing values
 And below graph shows the top 50 names of columns along with its missing percent.
 
-![alt text](https://glassboxmedicine.files.wordpress.com/2019/02/roc-curve-v2.png)
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/nullity_.png)
 
-
+[alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/nullity_2.png)
 I also removed any columns that are not in attr or info dataframe.
 
 After that we moved to 243 columns, better than 366.
 
 After that I did a lot of transformation in different columns, and create a pipeline for feature selection,
-you can check here -> ![alt text](https://glassboxmedicine.files.wordpress.com/2019/02/roc-curve-v2.png)
+you can check here -> ![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/process_and_ml/feature_engineer.py)
 
 
 ### Algorithms and Techniques
@@ -75,7 +75,7 @@ First I apply catboost to discovery the feature importance and after that I saw 
 Unfortunately I don't have description for these columns. I can use later to reach better results.
 
 After That I did some transforms using sklearn pipeline and Column Transform:
-![alt text](imagem do transform)
+![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/transform_pipeline.png)
 
 
 I use also PCA, KNN for feature selection.
