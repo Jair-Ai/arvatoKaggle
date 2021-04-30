@@ -35,7 +35,7 @@ Now that you've found which parts of the population are more likely to be custom
 
 The "MAILOUT" data has been split into two approximately equal parts, each with almost 43 000 data rows. In this part, you can verify your model with the "TRAIN" partition, which includes a column, "RESPONSE", that states whether or not a person became a customer of the company following the campaign. In the next part, you'll need to create predictions on the "TEST" partition, where the "RESPONSE" column has been withheld.
 #### Example Controling experiments with MLFLOW
-![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/mlflow_exemple.png)
+![Mflow Example](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/mlflow_exemple.png)
 #### Notebook
 [Jupyter Notebook](https://github.com/Jair-Ai/arvatoKaggle/blob/master/notebooks/supervised_learning.ipynb)
 
@@ -44,11 +44,13 @@ Now that you've created a model to predict which individuals are most likely to 
 
 Your entry to the competition should be a CSV file with two columns. The first column should be a copy of "LNR", which acts as an ID number for each individual in the "TEST" partition. The second column, "RESPONSE", should be some measure of how likely each individual became a customer – this might not be a straightforward probability. As you should have found in Part 2, there is a large output class imbalance, where most individuals did not respond to the mailout. Thus, predicting individual classes and using accuracy does not seem to be an appropriate performance evaluation method. Instead, the competition will be using AUC to evaluate performance. The exact values of the "RESPONSE" column do not matter as much: only that the higher values try to capture as many of the actual customers as possible, early in the ROC curve sweep.
 
-![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/best_result_kaggle.png)
+![BestResult](https://github.com/Jair-Ai/arvatoKaggle/blob/master/images/best_result_kaggle.png)
 
 
 
-### Proposal -> ![alt text](https://github.com/Jair-Ai/arvatoKaggle/blob/master/Report%20for%20Arvato%20Financial%20Solutions%20Proposal.pdf)
+### ![Proposal](https://github.com/Jair-Ai/arvatoKaggle/blob/master/Report%20for%20Arvato%20Financial%20Solutions%20Proposal.pdf)
+
+## ![Report](https://github.com/Jair-Ai/arvatoKaggle/blob/master/Machine%20Learning%20Engineer%20Nanodegree%20Report.pdf)
 
 
 ------
@@ -57,7 +59,7 @@ Your entry to the competition should be a CSV file with two columns. The first c
 ### Useful commands:
 
 If you dont have poetry on you machine click bellow to official instalation guide:
-![alt text](https://python-poetry.org/docs/#installation)
+![poetry website](https://python-poetry.org/docs/#installation)
 Installing dependencies:
 ```bash
 poetry install
